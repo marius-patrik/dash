@@ -1,0 +1,97 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { useChat } from "@/lib/hooks/use-chat";
+import { ChatMessage } from "./message";
+import { ChatInput } from "./input";
+import { StreamingToolCall } from "./tool-call";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Bot } from "lucide-react";
+import type { Message } from "@dash/shared";
+
+interface ChatViewProps {
+  sessionId: string;
+  initialMessages?: Message[];
+}
+
+export function ChatView({ sessionId, initialMessages = [] }: ChatViewProps) {
+  const {
+    messages,
+    streamingText,
+    activeTools,
+    isStreaming,
+    error,
+    sendMessage,
+    abort,
+    connect,
+    setMessages,
+  } = useChat(sessionId);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (initialMessages.length > 0) {
+      setMessages(initialMessages);
+    }
+    connect();
+  }, [sessionId]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, streamingText, activeTools]);
+
+  return (
+    <div className="flex flex-col h-full">
+      <ScrollArea className="flex-1" ref={scrollRef}>
+        <div className="max-w-3xl mx-auto px-4">
+          {messages.length === 0 && !isStreaming && (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <Bot className="h-12 w-12 mb-4" />
+              <p className="text-lg font-medium">Start a conversation</p>
+              <p className="text-sm">Send a message to begin</p>
+            </div>
+          )}
+
+          {messages.map((msg) => (
+            <ChatMessage key={msg.id} message={msg} />
+          ))}
+
+          {/* Streaming text */}
+          {streamingText && (
+            <div className="flex gap-3 py-4">
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted shrink-0">
+                <Bot className="h-4 w-4" />
+              </div>
+              <div className="rounded-lg px-4 py-2 text-sm bg-muted max-w-[80%]">
+                {streamingText}
+                <span className="animate-pulse">|</span>
+              </div>
+            </div>
+          )}
+
+          {/* Active tool calls */}
+          {Array.from(activeTools.entries()).map(([id, tool]) => (
+            <div key={id} className="ml-11 mb-2">
+              <StreamingToolCall name={tool.name} input={tool.input} />
+            </div>
+          ))}
+
+          {error && (
+            <div className="text-sm text-destructive bg-destructive/10 rounded-md p-3 mx-11 mb-4">
+              {error}
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      <ChatInput
+        onSend={sendMessage}
+        onAbort={abort}
+        isStreaming={isStreaming}
+      />
+    </div>
+  );
+}
