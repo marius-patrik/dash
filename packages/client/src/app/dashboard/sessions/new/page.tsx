@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation } from "wouter";
 import { apiGet, apiPost } from "@/lib/api";
 import type { AgentConfig, McpServer, Skill, CreateSessionRequest } from "@dash/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +17,7 @@ import {
 import { toast } from "sonner";
 
 export default function NewSessionPage() {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [name, setName] = useState("");
   const [agentConfigId, setAgentConfigId] = useState("");
   const [selectedMcp, setSelectedMcp] = useState<string[]>([]);

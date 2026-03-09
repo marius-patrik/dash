@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams } from "wouter";
 import { apiGet } from "@/lib/api";
 import { ChatView } from "@/components/chat/chat-view";
 import type { Session, Message } from "@dash/shared";

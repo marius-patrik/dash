@@ -1,5 +1,4 @@
-
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import {
   MessageSquare,
@@ -26,7 +25,7 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const { pathname } = useLocation();
+  const [pathname] = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -63,7 +62,7 @@ export function Sidebar() {
           return (
             <Link
               key={item.href}
-              to={item.href}
+              href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                 isActive

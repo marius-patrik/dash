@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "wouter";
 import { apiGet, apiPost, apiDelete } from "@/lib/api";
 import type { AgentConfig, CreateAgentConfigRequest } from "@dash/shared";
 import { AVAILABLE_MODELS } from "@dash/shared";
@@ -167,7 +167,7 @@ export default function AgentsPage() {
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   {agent.system_prompt || "No system prompt"}
                 </p>
-                <Link to={`/dashboard/agents/${agent.id}`}>
+                <Link href={`/dashboard/agents/${agent.id}`}>
                   <Button variant="link" className="px-0 mt-2 text-xs">
                     Edit
                   </Button>

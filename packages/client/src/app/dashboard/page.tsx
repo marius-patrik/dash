@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Link to="/dashboard/sessions/new">
+        <Link href="/dashboard/sessions/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             New Session
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">
               No sessions yet.{" "}
               <Link
-                to="/dashboard/sessions/new"
+                href="/dashboard/sessions/new"
                 className="text-primary hover:underline"
               >
                 Create your first session
@@ -113,7 +113,7 @@ export default function DashboardPage() {
               {sessions.slice(0, 5).map((session) => (
                 <Link
                   key={session.id}
-                  to={`/dashboard/sessions/${session.id}`}
+                  href={`/dashboard/sessions/${session.id}`}
                   className="flex items-center justify-between p-3 rounded-md hover:bg-accent transition-colors"
                 >
                   <div className="flex items-center gap-3">

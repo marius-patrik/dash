@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams } from "wouter";
 import { apiGet, apiPatch } from "@/lib/api";
 import type { AgentConfig } from "@dash/shared";
 import { AVAILABLE_MODELS, BUILT_IN_TOOLS } from "@dash/shared";
@@ -20,11 +20,10 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "wouter";
 
 export default function EditAgentPage() {
   const params = useParams();
-  const navigate = useNavigate();
   const id = params.id as string;
 
   const [agent, setAgent] = useState<AgentConfig | null>(null);
@@ -78,7 +77,7 @@ export default function EditAgentPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/agents">
+        <Link href="/dashboard/agents">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
