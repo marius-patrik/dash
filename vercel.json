@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd packages/client && bun run build",
+  "buildCommand": "bun run --filter @dash/shared build && bun run --filter @dash/client build",
   "outputDirectory": "packages/client/dist",
   "installCommand": "bun install",
   "framework": null,

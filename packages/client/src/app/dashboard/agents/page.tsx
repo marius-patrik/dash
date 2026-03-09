@@ -168,8 +168,8 @@ export default function AgentsPage() {
                   {agent.system_prompt || "No system prompt"}
                 </p>
                 <Link href={`/dashboard/agents/${agent.id}`}>
-                  <Button variant="link" className="px-0 mt-2 text-xs">
-                    Edit
+                  <Button variant="outline" size="sm" className="mt-2">
+                    Edit Configuration
                   </Button>
                 </Link>
               </CardContent>

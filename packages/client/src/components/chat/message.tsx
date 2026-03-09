@@ -69,7 +69,13 @@ export function ChatMessage({ message }: { message: Message }) {
         )}
 
         {message.tool_calls?.map((tc) => (
-          <ToolCallView key={tc.id} toolCall={tc} />
+          <ToolCallView
+            key={tc.id}
+            toolCall={tc}
+            result={message.tool_results?.find(
+              (r) => r.tool_use_id === tc.id
+            )}
+          />
         ))}
       </div>
     </div>

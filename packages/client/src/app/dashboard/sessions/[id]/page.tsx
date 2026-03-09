@@ -1,13 +1,16 @@
-
 import { useEffect, useState } from "react";
-import { useParams } from "wouter";
-import { apiGet } from "@/lib/api";
+import { useParams, useLocation } from "wouter";
+import { apiGet, apiPost, apiPatch } from "@/lib/api";
 import { ChatView } from "@/components/chat/chat-view";
 import type { Session, Message } from "@dash/shared";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { GitFork, Play, Pause, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SessionPage() {
   const params = useParams();
+  const [, navigate] = useLocation();
   const sessionId = params.id as string;
   const [session, setSession] = useState<Session | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,6 +27,34 @@ export default function SessionPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [sessionId]);
+
+  async function handleFork() {
+    if (!session) return;
+    try {
+      const forked = await apiPost<Session>("/api/sessions", {
+        name: `${session.name} (fork)`,
+        agent_config_id: session.agent_config_id,
+        mcp_server_ids: session.mcp_server_ids,
+        skill_ids: session.skill_ids,
+        tags: [...session.tags, "forked"],
+      });
+      toast.success("Session forked");
+      navigate(`/dashboard/sessions/${forked.id}`);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  }
+
+  async function handleStatusChange(status: "active" | "paused" | "completed") {
+    if (!session) return;
+    try {
+      await apiPatch(`/api/sessions/${sessionId}`, { status });
+      setSession({ ...session, status });
+      toast.success(`Session ${status}`);
+    } catch {
+      toast.error("Failed to update status");
+    }
+  }
 
   if (loading) {
     return <div className="text-muted-foreground">Loading session...</div>;
@@ -42,6 +73,42 @@ export default function SessionPage() {
         >
           {session.status}
         </Badge>
+        <div className="ml-auto flex items-center gap-1">
+          {session.status === "paused" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleStatusChange("active")}
+            >
+              <Play className="h-3 w-3 mr-1" />
+              Resume
+            </Button>
+          )}
+          {session.status === "active" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleStatusChange("paused")}
+            >
+              <Pause className="h-3 w-3 mr-1" />
+              Pause
+            </Button>
+          )}
+          {session.status !== "completed" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleStatusChange("completed")}
+            >
+              <CheckCircle2 className="h-3 w-3 mr-1" />
+              Complete
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onClick={handleFork}>
+            <GitFork className="h-3 w-3 mr-1" />
+            Fork
+          </Button>
+        </div>
       </div>
       <div className="flex-1 min-h-0">
         <ChatView sessionId={sessionId} initialMessages={messages} />

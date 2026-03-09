@@ -6,6 +6,7 @@ import {
   Server,
   Sparkles,
   Brain,
+  Layers,
   Settings,
   LayoutDashboard,
   PanelLeftClose,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard/mcp", icon: Server, label: "MCP Servers" },
   { href: "/dashboard/skills", icon: Sparkles, label: "Skills" },
   { href: "/dashboard/memory", icon: Brain, label: "Memory" },
+  { href: "/dashboard/context", icon: Layers, label: "Context" },
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 

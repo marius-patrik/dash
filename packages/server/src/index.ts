@@ -11,6 +11,7 @@ import { registerAgentRoutes } from "./routes/agents";
 import { registerMcpRoutes } from "./routes/mcp";
 import { registerSkillRoutes } from "./routes/skills";
 import { registerMemoryRoutes } from "./routes/memory";
+import { registerContextPresetRoutes } from "./routes/context-presets";
 import { registerChatWebSocket } from "./ws/chat";
 
 async function main() {
@@ -42,6 +43,7 @@ async function main() {
   registerMcpRoutes(app);
   registerSkillRoutes(app);
   registerMemoryRoutes(app);
+  registerContextPresetRoutes(app);
 
   // WebSocket chat
   registerChatWebSocket(app);

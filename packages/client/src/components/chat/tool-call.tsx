@@ -1,10 +1,22 @@
 
 import { useState } from "react";
-import type { ToolCallData } from "@dash/shared";
+import type { ToolCallData, ToolResultData } from "@dash/shared";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronRight, Wrench } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Wrench,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
-export function ToolCallView({ toolCall }: { toolCall: ToolCallData }) {
+export function ToolCallView({
+  toolCall,
+  result,
+}: {
+  toolCall: ToolCallData;
+  result?: ToolResultData;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -22,12 +34,36 @@ export function ToolCallView({ toolCall }: { toolCall: ToolCallData }) {
         <Badge variant="outline" className="text-xs">
           {toolCall.name}
         </Badge>
+        {result && (
+          result.is_error ? (
+            <XCircle className="h-3 w-3 text-destructive ml-auto" />
+          ) : (
+            <CheckCircle2 className="h-3 w-3 text-green-500 ml-auto" />
+          )
+        )}
       </button>
       {expanded && (
-        <div className="px-3 pb-3 border-t border-border">
-          <pre className="overflow-x-auto text-xs mt-2 p-2 rounded bg-muted">
-            {JSON.stringify(toolCall.input, null, 2)}
-          </pre>
+        <div className="px-3 pb-3 border-t border-border space-y-2">
+          <div>
+            <span className="text-xs text-muted-foreground">Input</span>
+            <pre className="overflow-x-auto text-xs mt-1 p-2 rounded bg-muted">
+              {JSON.stringify(toolCall.input, null, 2)}
+            </pre>
+          </div>
+          {result && (
+            <div>
+              <span className="text-xs text-muted-foreground">
+                {result.is_error ? "Error" : "Output"}
+              </span>
+              <pre
+                className={`overflow-x-auto text-xs mt-1 p-2 rounded max-h-40 overflow-y-auto ${
+                  result.is_error ? "bg-destructive/10 text-destructive" : "bg-muted"
+                }`}
+              >
+                {result.content}
+              </pre>
+            </div>
+          )}
         </div>
       )}
     </div>

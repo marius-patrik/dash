@@ -12,6 +12,7 @@ import McpPage from "./app/dashboard/mcp/page";
 import SkillsPage from "./app/dashboard/skills/page";
 import EditSkillPage from "./app/dashboard/skills/[id]/page";
 import MemoryPage from "./app/dashboard/memory/page";
+import ContextPresetsPage from "./app/dashboard/context/page";
 import SettingsPage from "./app/dashboard/settings/page";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,6 +48,7 @@ function DashboardRoutes() {
           <Route path="/dashboard/skills/:id" component={EditSkillPage} />
           <Route path="/dashboard/skills" component={SkillsPage} />
           <Route path="/dashboard/memory" component={MemoryPage} />
+          <Route path="/dashboard/context" component={ContextPresetsPage} />
           <Route path="/dashboard/settings" component={SettingsPage} />
         </Switch>
       </DashboardLayout>
