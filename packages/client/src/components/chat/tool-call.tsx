@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from "react";
 import type { ToolCallData } from "@dash/shared";

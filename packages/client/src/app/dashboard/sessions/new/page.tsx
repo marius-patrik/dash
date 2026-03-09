@@ -1,7 +1,6 @@
-"use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router";
 import { apiGet, apiPost } from "@/lib/api";
 import type { AgentConfig, McpServer, Skill, CreateSessionRequest } from "@dash/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,7 @@ import {
 import { toast } from "sonner";
 
 export default function NewSessionPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [agentConfigId, setAgentConfigId] = useState("");
   const [selectedMcp, setSelectedMcp] = useState<string[]>([]);
@@ -57,7 +56,7 @@ export default function NewSessionPage() {
         skill_ids: selectedSkills,
       } satisfies CreateSessionRequest);
 
-      router.push(`/dashboard/sessions/${session.id}`);
+      navigate(`/dashboard/sessions/${session.id}`);
     } catch (err: any) {
       toast.error(err.message);
     } finally {

@@ -1,4 +1,3 @@
-"use client";
 
 import { useAuth } from "@/providers/auth-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

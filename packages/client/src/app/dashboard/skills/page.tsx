@@ -1,7 +1,6 @@
-"use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "react-router";
 import { apiGet, apiPost, apiDelete } from "@/lib/api";
 import type { Skill, CreateSkillRequest } from "@dash/shared";
 import { SKILL_CATEGORIES } from "@dash/shared";
@@ -183,7 +182,7 @@ export default function SkillsPage() {
                 <p className="text-xs text-muted-foreground line-clamp-3 font-mono">
                   {skill.content}
                 </p>
-                <Link href={`/dashboard/skills/${skill.id}`}>
+                <Link to={`/dashboard/skills/${skill.id}`}>
                   <Button variant="link" className="px-0 mt-2 text-xs">
                     Edit
                   </Button>

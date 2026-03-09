@@ -1,4 +1,3 @@
-"use client";
 
 import { useEffect, useState } from "react";
 import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/api";

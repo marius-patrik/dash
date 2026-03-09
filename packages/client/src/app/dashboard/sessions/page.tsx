@@ -1,7 +1,6 @@
-"use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "react-router";
 import { apiGet, apiDelete } from "@/lib/api";
 import type { Session } from "@dash/shared";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,7 +42,7 @@ export default function SessionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Sessions</h1>
-        <Link href="/dashboard/sessions/new">
+        <Link to="/dashboard/sessions/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             New Session
@@ -64,7 +63,7 @@ export default function SessionsPage() {
             <Card key={session.id} className="hover:bg-accent/50 transition-colors">
               <CardContent className="flex items-center justify-between py-4">
                 <Link
-                  href={`/dashboard/sessions/${session.id}`}
+                  to={`/dashboard/sessions/${session.id}`}
                   className="flex items-center gap-3 flex-1"
                 >
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />

@@ -1,4 +1,3 @@
-"use client";
 
 import type { Message } from "@dash/shared";
 import { cn } from "@/lib/utils";

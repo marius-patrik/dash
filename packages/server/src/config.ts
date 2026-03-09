@@ -13,8 +13,8 @@ export const config = {
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
   supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || "",
 
-  // Path to Next.js static export (built client)
-  clientDistPath: process.env.CLIENT_DIST_PATH || "../client/out",
+  // Path to Rsbuild output (built client)
+  clientDistPath: process.env.CLIENT_DIST_PATH || "../../client/dist",
 
   get hasClaudeAuth(): boolean {
     return !!(this.claudeOAuthToken || this.anthropicApiKey);

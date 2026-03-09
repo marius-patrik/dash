@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -31,7 +29,7 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
-        router.push("/dashboard");
+        navigate("/dashboard");
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -79,6 +77,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <button
+            type="button"
             onClick={() => setIsSignUp(!isSignUp)}
             className="mt-4 text-sm text-muted-foreground hover:text-foreground w-full text-center"
           >

@@ -9,6 +9,11 @@
     "dev:server": "bun run --filter @dash/server dev",
     "dev:client": "bun run --filter @dash/client dev",
     "build": "bun run --filter @dash/shared build && bun run --filter @dash/client build && bun run --filter @dash/server build",
-    "start": "bun run --filter @dash/server start"
+    "start": "bun run --filter @dash/server start",
+    "check": "biome check --write .",
+    "lint": "biome lint ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.6"
   }
 }
