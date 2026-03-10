@@ -1,5 +1,7 @@
-import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
+import { Authenticated, AuthLoading, Unauthenticated, useMutation, useQuery } from "convex/react";
+import { useEffect } from "react";
 import { Redirect, Route, Switch } from "wouter";
+import { api } from "../convex/_generated/api";
 import EditAgentPage from "./app/dashboard/agents/[id]/page";
 import AgentsPage from "./app/dashboard/agents/page";
 import ContextPresetsPage from "./app/dashboard/context/page";
@@ -36,6 +38,41 @@ function DashboardRoutes() {
   );
 }
 
+function AuthenticatedApp() {
+  const ensureUser = useMutation(api.users.ensureUser);
+  const user = useQuery(api.users.current);
+
+  useEffect(() => {
+    ensureUser().catch(() => {});
+  }, [ensureUser]);
+
+  if (user === undefined) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (user === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Setting up your account...</div>
+      </div>
+    );
+  }
+
+  return (
+    <Switch>
+      <Route path="/dashboard/:rest*" component={DashboardRoutes} />
+      <Route path="/dashboard" component={DashboardRoutes} />
+      <Route>
+        <Redirect href="/dashboard" replace />
+      </Route>
+    </Switch>
+  );
+}
+
 export function AppRouter() {
   return (
     <>
@@ -53,13 +90,7 @@ export function AppRouter() {
         </Switch>
       </Unauthenticated>
       <Authenticated>
-        <Switch>
-          <Route path="/dashboard/:rest*" component={DashboardRoutes} />
-          <Route path="/dashboard" component={DashboardRoutes} />
-          <Route>
-            <Redirect href="/dashboard" replace />
-          </Route>
-        </Switch>
+        <AuthenticatedApp />
       </Authenticated>
     </>
   );
