@@ -1,17 +1,17 @@
-import Fastify from "fastify";
-import fastifyWebSocket from "@fastify/websocket";
-import fastifyStatic from "@fastify/static";
+import path from "node:path";
 import fastifyCors from "@fastify/cors";
-import path from "path";
+import fastifyStatic from "@fastify/static";
+import fastifyWebSocket from "@fastify/websocket";
+import Fastify from "fastify";
 import { config } from "./config";
 import { authMiddleware } from "./middleware/auth";
-import { registerHealthRoutes } from "./routes/health";
-import { registerSessionRoutes } from "./routes/sessions";
 import { registerAgentRoutes } from "./routes/agents";
-import { registerMcpRoutes } from "./routes/mcp";
-import { registerSkillRoutes } from "./routes/skills";
-import { registerMemoryRoutes } from "./routes/memory";
 import { registerContextPresetRoutes } from "./routes/context-presets";
+import { registerHealthRoutes } from "./routes/health";
+import { registerMcpRoutes } from "./routes/mcp";
+import { registerMemoryRoutes } from "./routes/memory";
+import { registerSessionRoutes } from "./routes/sessions";
+import { registerSkillRoutes } from "./routes/skills";
 import { registerChatWebSocket } from "./ws/chat";
 
 async function main() {
@@ -28,10 +28,7 @@ async function main() {
 
   // Auth middleware for /api/* routes
   app.addHook("onRequest", async (req, reply) => {
-    if (
-      req.url.startsWith("/api/") &&
-      req.url !== "/api/health"
-    ) {
+    if (req.url.startsWith("/api/") && req.url !== "/api/health") {
       await authMiddleware(req, reply);
     }
   });
@@ -49,12 +46,9 @@ async function main() {
   registerChatWebSocket(app);
 
   // Serve Next.js static export in production
-  const clientDist = path.resolve(
-    import.meta.dir,
-    config.clientDistPath
-  );
+  const clientDist = path.resolve(import.meta.dir, config.clientDistPath);
 
-  const { existsSync } = await import("fs");
+  const { existsSync } = await import("node:fs");
   if (existsSync(clientDist)) {
     await app.register(fastifyStatic, {
       root: clientDist,
@@ -76,7 +70,9 @@ async function main() {
       if (req.url.startsWith("/api/") || req.url.startsWith("/ws/")) {
         return reply.status(404).send({ error: "Not found" });
       }
-      return reply.status(200).send({ message: "Client not built. Run: bun run --filter @dash/client build" });
+      return reply
+        .status(200)
+        .send({ message: "Client not built. Run: bun run --filter @dash/client build" });
     });
   }
 

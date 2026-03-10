@@ -1,12 +1,10 @@
+import type { ContextPreset, Memory, Skill } from "@dash/shared";
+import { Brain, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/api";
-import type { ContextPreset, Skill, Memory } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,8 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Layers, Plus, Trash2, Pencil, Brain, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 
 export default function ContextPresetsPage() {
   const [presets, setPresets] = useState<ContextPreset[]>([]);
@@ -73,19 +73,11 @@ export default function ContextPresetsPage() {
       };
 
       if (editingId) {
-        const updated = await apiPatch<ContextPreset>(
-          `/api/context-presets/${editingId}`,
-          body
-        );
-        setPresets((prev) =>
-          prev.map((p) => (p.id === editingId ? updated : p))
-        );
+        const updated = await apiPatch<ContextPreset>(`/api/context-presets/${editingId}`, body);
+        setPresets((prev) => prev.map((p) => (p.id === editingId ? updated : p)));
         toast.success("Preset updated");
       } else {
-        const created = await apiPost<ContextPreset>(
-          "/api/context-presets",
-          body
-        );
+        const created = await apiPost<ContextPreset>("/api/context-presets", body);
         setPresets((prev) => [created, ...prev]);
         toast.success("Preset created");
       }
@@ -106,14 +98,8 @@ export default function ContextPresetsPage() {
     }
   }
 
-  function toggleItem(
-    list: string[],
-    setList: (v: string[]) => void,
-    id: string
-  ) {
-    setList(
-      list.includes(id) ? list.filter((i) => i !== id) : [...list, id]
-    );
+  function toggleItem(list: string[], setList: (v: string[]) => void, id: string) {
+    setList(list.includes(id) ? list.filter((i) => i !== id) : [...list, id]);
   }
 
   if (loading) return <div className="text-muted-foreground">Loading...</div>;
@@ -137,9 +123,7 @@ export default function ContextPresetsPage() {
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
-                {editingId ? "Edit Preset" : "Create Context Preset"}
-              </DialogTitle>
+              <DialogTitle>{editingId ? "Edit Preset" : "Create Context Preset"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -170,19 +154,9 @@ export default function ContextPresetsPage() {
                     {skills.map((s) => (
                       <Badge
                         key={s.id}
-                        variant={
-                          selectedSkills.includes(s.id)
-                            ? "default"
-                            : "outline"
-                        }
+                        variant={selectedSkills.includes(s.id) ? "default" : "outline"}
                         className="cursor-pointer"
-                        onClick={() =>
-                          toggleItem(
-                            selectedSkills,
-                            setSelectedSkills,
-                            s.id
-                          )
-                        }
+                        onClick={() => toggleItem(selectedSkills, setSelectedSkills, s.id)}
                       >
                         {s.name}
                       </Badge>
@@ -200,19 +174,9 @@ export default function ContextPresetsPage() {
                     {memories.map((m) => (
                       <Badge
                         key={m.id}
-                        variant={
-                          selectedMemories.includes(m.id)
-                            ? "default"
-                            : "outline"
-                        }
+                        variant={selectedMemories.includes(m.id) ? "default" : "outline"}
                         className="cursor-pointer"
-                        onClick={() =>
-                          toggleItem(
-                            selectedMemories,
-                            setSelectedMemories,
-                            m.id
-                          )
-                        }
+                        onClick={() => toggleItem(selectedMemories, setSelectedMemories, m.id)}
                       >
                         {m.key}
                       </Badge>
@@ -244,9 +208,7 @@ export default function ContextPresetsPage() {
                 <div>
                   <CardTitle className="text-base">{preset.name}</CardTitle>
                   {preset.description && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {preset.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{preset.description}</p>
                   )}
                 </div>
                 <div className="flex gap-1">
@@ -284,12 +246,9 @@ export default function ContextPresetsPage() {
                       {preset.included_memories.length !== 1 ? "ies" : "y"}
                     </Badge>
                   )}
-                  {preset.included_skills.length === 0 &&
-                    preset.included_memories.length === 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        Empty preset
-                      </span>
-                    )}
+                  {preset.included_skills.length === 0 && preset.included_memories.length === 0 && (
+                    <span className="text-xs text-muted-foreground">Empty preset</span>
+                  )}
                 </div>
               </CardContent>
             </Card>

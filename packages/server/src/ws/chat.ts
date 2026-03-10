@@ -1,9 +1,9 @@
+import type { WsClientMessage, WsServerMessage } from "@dash/shared";
 import type { FastifyInstance } from "fastify";
 import type { WebSocket } from "ws";
-import type { WsClientMessage, WsServerMessage } from "@dash/shared";
-import { runAgentQuery } from "../services/agent";
-import { getSupabaseAdmin } from "../db/supabase";
 import { config } from "../config";
+import { getSupabaseAdmin } from "../db/supabase";
+import { runAgentQuery } from "../services/agent";
 
 // Track active queries so we can abort them
 const activeQueries = new Map<string, AbortController>();
@@ -45,10 +45,7 @@ async function fetchSessionConfig(sessionId: string, userId: string) {
     .in("id", session.skill_ids || []);
 
   // Fetch all memories for context
-  const { data: memories } = await supabase
-    .from("memories")
-    .select("*")
-    .eq("user_id", userId);
+  const { data: memories } = await supabase.from("memories").select("*").eq("user_id", userId);
 
   return {
     session,
@@ -64,7 +61,7 @@ async function saveMessage(
   role: string,
   content: string,
   toolCalls?: any,
-  costUsd?: number
+  costUsd?: number,
 ) {
   if (!config.hasSupabase) return;
 

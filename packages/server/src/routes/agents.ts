@@ -1,6 +1,6 @@
+import type { CreateAgentConfigRequest } from "@dash/shared";
 import type { FastifyInstance } from "fastify";
 import { getSupabaseAdmin } from "../db/supabase";
-import type { CreateAgentConfigRequest } from "@dash/shared";
 
 export function registerAgentRoutes(app: FastifyInstance) {
   app.get("/api/agents", async (req) => {
@@ -70,23 +70,20 @@ export function registerAgentRoutes(app: FastifyInstance) {
 
       if (error) throw error;
       return data;
-    }
+    },
   );
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/agents/:id",
-    async (req, reply) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.delete<{ Params: { id: string } }>("/api/agents/:id", async (req, reply) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { error } = await supabase
-        .from("agent_configs")
-        .delete()
-        .eq("id", req.params.id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("agent_configs")
+      .delete()
+      .eq("id", req.params.id)
+      .eq("user_id", userId);
 
-      if (error) throw error;
-      return reply.status(204).send();
-    }
-  );
+    if (error) throw error;
+    return reply.status(204).send();
+  });
 }

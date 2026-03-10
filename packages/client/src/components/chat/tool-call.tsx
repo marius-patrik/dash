@@ -1,14 +1,7 @@
-
-import { useState } from "react";
 import type { ToolCallData, ToolResultData } from "@dash/shared";
+import { CheckCircle2, ChevronDown, ChevronRight, Wrench, XCircle } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import {
-  ChevronDown,
-  ChevronRight,
-  Wrench,
-  CheckCircle2,
-  XCircle,
-} from "lucide-react";
 
 export function ToolCallView({
   toolCall,
@@ -25,22 +18,17 @@ export function ToolCallView({
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-2 w-full px-3 py-2 hover:bg-accent transition-colors"
       >
-        {expanded ? (
-          <ChevronDown className="h-3 w-3" />
-        ) : (
-          <ChevronRight className="h-3 w-3" />
-        )}
+        {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         <Wrench className="h-3 w-3 text-muted-foreground" />
         <Badge variant="outline" className="text-xs">
           {toolCall.name}
         </Badge>
-        {result && (
-          result.is_error ? (
+        {result &&
+          (result.is_error ? (
             <XCircle className="h-3 w-3 text-destructive ml-auto" />
           ) : (
             <CheckCircle2 className="h-3 w-3 text-green-500 ml-auto" />
-          )
-        )}
+          ))}
       </button>
       {expanded && (
         <div className="px-3 pb-3 border-t border-border space-y-2">
@@ -70,13 +58,7 @@ export function ToolCallView({
   );
 }
 
-export function StreamingToolCall({
-  name,
-  input,
-}: {
-  name: string;
-  input: string;
-}) {
+export function StreamingToolCall({ name, input }: { name: string; input: string }) {
   return (
     <div className="w-full rounded-md border border-border bg-card text-sm animate-pulse">
       <div className="flex items-center gap-2 px-3 py-2">
@@ -88,9 +70,7 @@ export function StreamingToolCall({
       </div>
       {input && (
         <div className="px-3 pb-2">
-          <pre className="overflow-x-auto text-xs p-2 rounded bg-muted">
-            {input}
-          </pre>
+          <pre className="overflow-x-auto text-xs p-2 rounded bg-muted">{input}</pre>
         </div>
       )}
     </div>

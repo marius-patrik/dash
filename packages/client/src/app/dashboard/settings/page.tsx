@@ -1,20 +1,16 @@
 import { useState } from "react";
-import { useAuth } from "@/providers/auth-provider";
-import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/providers/auth-provider";
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const [displayName, setDisplayName] = useState(
-    user?.user_metadata?.display_name || ""
-  );
-  const [avatarUrl, setAvatarUrl] = useState(
-    user?.user_metadata?.avatar_url || ""
-  );
+  const [displayName, setDisplayName] = useState(user?.user_metadata?.display_name || "");
+  const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || "");
   const [saving, setSaving] = useState(false);
 
   async function handleSaveProfile(e: React.FormEvent) {
@@ -95,9 +91,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">User ID</span>
-            <code className="text-xs text-muted-foreground">
-              {user?.id || "—"}
-            </code>
+            <code className="text-xs text-muted-foreground">{user?.id || "—"}</code>
           </div>
         </CardContent>
       </Card>

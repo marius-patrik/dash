@@ -1,19 +1,19 @@
-import { Switch, Route, Redirect } from "wouter";
-import { useAuth } from "./providers/auth-provider";
-import DashboardLayout from "./app/dashboard/layout";
-import DashboardPage from "./app/dashboard/page";
-import LoginPage from "./app/login/page";
-import SessionsPage from "./app/dashboard/sessions/page";
-import NewSessionPage from "./app/dashboard/sessions/new/page";
-import SessionPage from "./app/dashboard/sessions/[id]/page";
-import AgentsPage from "./app/dashboard/agents/page";
+import { Redirect, Route, Switch } from "wouter";
 import EditAgentPage from "./app/dashboard/agents/[id]/page";
-import McpPage from "./app/dashboard/mcp/page";
-import SkillsPage from "./app/dashboard/skills/page";
-import EditSkillPage from "./app/dashboard/skills/[id]/page";
-import MemoryPage from "./app/dashboard/memory/page";
+import AgentsPage from "./app/dashboard/agents/page";
 import ContextPresetsPage from "./app/dashboard/context/page";
+import DashboardLayout from "./app/dashboard/layout";
+import McpPage from "./app/dashboard/mcp/page";
+import MemoryPage from "./app/dashboard/memory/page";
+import DashboardPage from "./app/dashboard/page";
+import SessionPage from "./app/dashboard/sessions/[id]/page";
+import NewSessionPage from "./app/dashboard/sessions/new/page";
+import SessionsPage from "./app/dashboard/sessions/page";
 import SettingsPage from "./app/dashboard/settings/page";
+import EditSkillPage from "./app/dashboard/skills/[id]/page";
+import SkillsPage from "./app/dashboard/skills/page";
+import LoginPage from "./app/login/page";
+import { useAuth } from "./providers/auth-provider";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

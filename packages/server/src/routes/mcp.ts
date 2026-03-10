@@ -1,6 +1,6 @@
+import type { CreateMcpServerRequest } from "@dash/shared";
 import type { FastifyInstance } from "fastify";
 import { getSupabaseAdmin } from "../db/supabase";
-import type { CreateMcpServerRequest } from "@dash/shared";
 
 export function registerMcpRoutes(app: FastifyInstance) {
   app.get("/api/mcp", async (req) => {
@@ -55,23 +55,20 @@ export function registerMcpRoutes(app: FastifyInstance) {
 
       if (error) throw error;
       return data;
-    }
+    },
   );
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/mcp/:id",
-    async (req, reply) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.delete<{ Params: { id: string } }>("/api/mcp/:id", async (req, reply) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { error } = await supabase
-        .from("mcp_servers")
-        .delete()
-        .eq("id", req.params.id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("mcp_servers")
+      .delete()
+      .eq("id", req.params.id)
+      .eq("user_id", userId);
 
-      if (error) throw error;
-      return reply.status(204).send();
-    }
-  );
+    if (error) throw error;
+    return reply.status(204).send();
+  });
 }

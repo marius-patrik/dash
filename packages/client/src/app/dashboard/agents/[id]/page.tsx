@@ -1,16 +1,13 @@
-
-import { useEffect, useState } from "react";
-import { useParams } from "wouter";
-import { apiGet, apiPatch } from "@/lib/api";
 import type { AgentConfig } from "@dash/shared";
-import { AVAILABLE_MODELS, BUILT_IN_TOOLS } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AVAILABLE_MODELS } from "@dash/shared";
+import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Link, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -18,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { apiGet, apiPatch } from "@/lib/api";
 
 export default function EditAgentPage() {
   const params = useParams();

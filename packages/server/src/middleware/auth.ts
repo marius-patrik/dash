@@ -1,11 +1,8 @@
-import type { FastifyRequest, FastifyReply } from "fastify";
-import { getSupabaseAdmin } from "../db/supabase";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import { config } from "../config";
+import { getSupabaseAdmin } from "../db/supabase";
 
-export async function authMiddleware(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
   // Skip auth if Supabase is not configured (dev mode)
   if (!config.hasSupabase) {
     (request as any).userId = "dev-user";

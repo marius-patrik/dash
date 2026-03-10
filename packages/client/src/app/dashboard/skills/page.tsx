@@ -1,22 +1,12 @@
-
-import { useEffect, useState } from "react";
-import { Link } from "wouter";
-import { apiGet, apiPost, apiDelete } from "@/lib/api";
-import type { Skill, CreateSkillRequest } from "@dash/shared";
+import type { CreateSkillRequest, Skill } from "@dash/shared";
 import { SKILL_CATEGORIES } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Plus, Sparkles, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +14,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Sparkles, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { apiDelete, apiGet, apiPost } from "@/lib/api";
 
 export default function SkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -176,9 +175,7 @@ export default function SkillsPage() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {skill.description}
-                </p>
+                <p className="text-sm text-muted-foreground mb-2">{skill.description}</p>
                 <p className="text-xs text-muted-foreground line-clamp-3 font-mono">
                   {skill.content}
                 </p>

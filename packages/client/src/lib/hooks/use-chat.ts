@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
 import type { Message, WsServerMessage } from "@dash/shared";
+import { useCallback, useRef, useState } from "react";
 import { createChatSocket } from "@/lib/ws";
 
 interface ChatState {
@@ -91,7 +91,7 @@ export function useChat(sessionId: string) {
       },
       () => {
         socketRef.current = null;
-      }
+      },
     );
   }, []);
 
@@ -126,7 +126,7 @@ export function useChat(sessionId: string) {
         content,
       });
     },
-    [sessionId, connect]
+    [sessionId, connect],
   );
 
   const abort = useCallback(() => {

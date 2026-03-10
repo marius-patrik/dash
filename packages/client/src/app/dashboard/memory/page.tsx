@@ -1,21 +1,10 @@
-
-import { useEffect, useState } from "react";
-import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/api";
-import type { Memory, CreateMemoryRequest } from "@dash/shared";
+import type { CreateMemoryRequest, Memory } from "@dash/shared";
 import { MEMORY_CATEGORIES } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Brain, Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Brain, Plus, Trash2, Pencil } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 
 export default function MemoryPage() {
   const [memories, setMemories] = useState<Memory[]>([]);
@@ -57,9 +55,7 @@ export default function MemoryPage() {
       if (editingId) {
         await apiPatch(`/api/memory/${editingId}`, { key, value, category });
         setMemories((prev) =>
-          prev.map((m) =>
-            m.id === editingId ? { ...m, key, value, category } : m
-          )
+          prev.map((m) => (m.id === editingId ? { ...m, key, value, category } : m)),
         );
         toast.success("Memory updated");
       } else {
@@ -100,7 +96,7 @@ export default function MemoryPage() {
     ? memories.filter(
         (m) =>
           m.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.value.toLowerCase().includes(searchQuery.toLowerCase())
+          m.value.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : memories;
 
@@ -112,7 +108,7 @@ export default function MemoryPage() {
       acc[cat].push(mem);
       return acc;
     },
-    {} as Record<string, Memory[]>
+    {} as Record<string, Memory[]>,
   );
 
   if (loading) return <div className="text-muted-foreground">Loading...</div>;
@@ -136,9 +132,7 @@ export default function MemoryPage() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {editingId ? "Edit Memory" : "Add Memory"}
-              </DialogTitle>
+              <DialogTitle>{editingId ? "Edit Memory" : "Add Memory"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="space-y-2">

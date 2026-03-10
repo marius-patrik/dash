@@ -1,6 +1,6 @@
+import type { CreateMemoryRequest } from "@dash/shared";
 import type { FastifyInstance } from "fastify";
 import { getSupabaseAdmin } from "../db/supabase";
-import type { CreateMemoryRequest } from "@dash/shared";
 
 export function registerMemoryRoutes(app: FastifyInstance) {
   app.get("/api/memory", async (req) => {
@@ -53,23 +53,20 @@ export function registerMemoryRoutes(app: FastifyInstance) {
 
       if (error) throw error;
       return data;
-    }
+    },
   );
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/memory/:id",
-    async (req, reply) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.delete<{ Params: { id: string } }>("/api/memory/:id", async (req, reply) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { error } = await supabase
-        .from("memories")
-        .delete()
-        .eq("id", req.params.id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("memories")
+      .delete()
+      .eq("id", req.params.id)
+      .eq("user_id", userId);
 
-      if (error) throw error;
-      return reply.status(204).send();
-    }
-  );
+    if (error) throw error;
+    return reply.status(204).send();
+  });
 }

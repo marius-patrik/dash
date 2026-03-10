@@ -1,6 +1,6 @@
+import type { CreateSessionRequest } from "@dash/shared";
 import type { FastifyInstance } from "fastify";
 import { getSupabaseAdmin } from "../db/supabase";
-import type { CreateSessionRequest } from "@dash/shared";
 
 export function registerSessionRoutes(app: FastifyInstance) {
   // List sessions
@@ -24,12 +24,7 @@ export function registerSessionRoutes(app: FastifyInstance) {
     const supabase = getSupabaseAdmin();
 
     const [sessionRes, messagesRes] = await Promise.all([
-      supabase
-        .from("sessions")
-        .select("*")
-        .eq("id", req.params.id)
-        .eq("user_id", userId)
-        .single(),
+      supabase.from("sessions").select("*").eq("id", req.params.id).eq("user_id", userId).single(),
       supabase
         .from("messages")
         .select("*")
@@ -82,30 +77,24 @@ export function registerSessionRoutes(app: FastifyInstance) {
 
       if (error) throw error;
       return data;
-    }
+    },
   );
 
   // Delete session
-  app.delete<{ Params: { id: string } }>(
-    "/api/sessions/:id",
-    async (req, reply) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.delete<{ Params: { id: string } }>("/api/sessions/:id", async (req, reply) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      // Delete messages first
-      await supabase
-        .from("messages")
-        .delete()
-        .eq("session_id", req.params.id);
+    // Delete messages first
+    await supabase.from("messages").delete().eq("session_id", req.params.id);
 
-      const { error } = await supabase
-        .from("sessions")
-        .delete()
-        .eq("id", req.params.id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("sessions")
+      .delete()
+      .eq("id", req.params.id)
+      .eq("user_id", userId);
 
-      if (error) throw error;
-      return reply.status(204).send();
-    }
-  );
+    if (error) throw error;
+    return reply.status(204).send();
+  });
 }

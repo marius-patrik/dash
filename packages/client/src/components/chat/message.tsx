@@ -1,25 +1,19 @@
-
 import type { Message } from "@dash/shared";
-import { cn } from "@/lib/utils";
 import { Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { cn } from "@/lib/utils";
 import { ToolCallView } from "./tool-call";
 
 export function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user";
 
   return (
-    <div
-      className={cn(
-        "flex gap-3 py-4",
-        isUser ? "flex-row-reverse" : "flex-row"
-      )}
-    >
+    <div className={cn("flex gap-3 py-4", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
         className={cn(
           "flex items-center justify-center h-8 w-8 rounded-full shrink-0",
-          isUser ? "bg-primary" : "bg-muted"
+          isUser ? "bg-primary" : "bg-muted",
         )}
       >
         {isUser ? (
@@ -29,18 +23,13 @@ export function ChatMessage({ message }: { message: Message }) {
         )}
       </div>
       <div
-        className={cn(
-          "flex flex-col max-w-[80%] space-y-2",
-          isUser ? "items-end" : "items-start"
-        )}
+        className={cn("flex flex-col max-w-[80%] space-y-2", isUser ? "items-end" : "items-start")}
       >
         {message.content && (
           <div
             className={cn(
               "rounded-lg px-4 py-2 text-sm",
-              isUser
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted"
+              isUser ? "bg-primary text-primary-foreground" : "bg-muted",
             )}
           >
             <ReactMarkdown
@@ -54,9 +43,7 @@ export function ChatMessage({ message }: { message: Message }) {
                 code: ({ children, className }) => {
                   const isInline = !className;
                   return isInline ? (
-                    <code className="bg-background/50 rounded px-1 py-0.5 text-xs">
-                      {children}
-                    </code>
+                    <code className="bg-background/50 rounded px-1 py-0.5 text-xs">{children}</code>
                   ) : (
                     <code className={className}>{children}</code>
                   );
@@ -72,9 +59,7 @@ export function ChatMessage({ message }: { message: Message }) {
           <ToolCallView
             key={tc.id}
             toolCall={tc}
-            result={message.tool_results?.find(
-              (r) => r.tool_use_id === tc.id
-            )}
+            result={message.tool_results?.find((r) => r.tool_use_id === tc.id)}
           />
         ))}
       </div>

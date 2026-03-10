@@ -1,17 +1,12 @@
-
-import { useEffect, useState } from "react";
-import { Link } from "wouter";
-import { apiGet, apiDelete } from "@/lib/api";
 import type { Session } from "@dash/shared";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  MessageSquare,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { MessageSquare, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Link } from "wouter";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { apiDelete, apiGet } from "@/lib/api";
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -80,11 +75,7 @@ export default function SessionsPage() {
                       {tag}
                     </Badge>
                   ))}
-                  <Badge
-                    variant={
-                      session.status === "active" ? "default" : "secondary"
-                    }
-                  >
+                  <Badge variant={session.status === "active" ? "default" : "secondary"}>
                     {session.status}
                   </Badge>
                   <Button

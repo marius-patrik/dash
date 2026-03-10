@@ -1,12 +1,10 @@
-
+import type { CreateMcpServerRequest, McpServer } from "@dash/shared";
+import { Plus, Power, PowerOff, Server, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/api";
-import type { McpServer, CreateMcpServerRequest } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,8 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Server, Plus, Trash2, Power, PowerOff } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 
 export default function McpPage() {
   const [servers, setServers] = useState<McpServer[]>([]);
@@ -70,9 +69,7 @@ export default function McpPage() {
     const newStatus = server.status === "active" ? "inactive" : "active";
     try {
       await apiPatch(`/api/mcp/${server.id}`, { status: newStatus } as any);
-      setServers((prev) =>
-        prev.map((s) => (s.id === server.id ? { ...s, status: newStatus } : s))
-      );
+      setServers((prev) => prev.map((s) => (s.id === server.id ? { ...s, status: newStatus } : s)));
     } catch {
       toast.error("Failed to update status");
     }
@@ -163,9 +160,7 @@ export default function McpPage() {
                 <div>
                   <CardTitle className="text-base">{server.name}</CardTitle>
                   <Badge
-                    variant={
-                      server.status === "active" ? "default" : "secondary"
-                    }
+                    variant={server.status === "active" ? "default" : "secondary"}
                     className="mt-1"
                   >
                     {server.status}

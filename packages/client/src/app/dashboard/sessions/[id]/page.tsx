@@ -1,12 +1,12 @@
+import type { Message, Session } from "@dash/shared";
+import { CheckCircle2, GitFork, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams, useLocation } from "wouter";
-import { apiGet, apiPost, apiPatch } from "@/lib/api";
+import { toast } from "sonner";
+import { useLocation, useParams } from "wouter";
 import { ChatView } from "@/components/chat/chat-view";
-import type { Session, Message } from "@dash/shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GitFork, Play, Pause, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
+import { apiGet, apiPatch, apiPost } from "@/lib/api";
 
 export default function SessionPage() {
   const params = useParams();
@@ -17,9 +17,7 @@ export default function SessionPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiGet<{ session: Session; messages: Message[] }>(
-      `/api/sessions/${sessionId}`
-    )
+    apiGet<{ session: Session; messages: Message[] }>(`/api/sessions/${sessionId}`)
       .then((data) => {
         setSession(data.session);
         setMessages(data.messages);
@@ -68,38 +66,24 @@ export default function SessionPage() {
     <div className="flex flex-col h-[calc(100vh-3.5rem-3rem)]">
       <div className="flex items-center gap-3 pb-3 border-b border-border mb-2">
         <h1 className="text-lg font-semibold">{session.name}</h1>
-        <Badge
-          variant={session.status === "active" ? "default" : "secondary"}
-        >
+        <Badge variant={session.status === "active" ? "default" : "secondary"}>
           {session.status}
         </Badge>
         <div className="ml-auto flex items-center gap-1">
           {session.status === "paused" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleStatusChange("active")}
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleStatusChange("active")}>
               <Play className="h-3 w-3 mr-1" />
               Resume
             </Button>
           )}
           {session.status === "active" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleStatusChange("paused")}
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleStatusChange("paused")}>
               <Pause className="h-3 w-3 mr-1" />
               Pause
             </Button>
           )}
           {session.status !== "completed" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleStatusChange("completed")}
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleStatusChange("completed")}>
               <CheckCircle2 className="h-3 w-3 mr-1" />
               Complete
             </Button>

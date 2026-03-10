@@ -1,11 +1,5 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import type {
-  AgentConfig,
-  McpServer,
-  Skill,
-  Memory,
-  WsServerMessage,
-} from "@dash/shared";
+import type { AgentConfig, McpServer, Memory, Skill, WsServerMessage } from "@dash/shared";
 
 interface AgentQueryOptions {
   prompt: string;
@@ -21,7 +15,7 @@ interface AgentQueryOptions {
 function assembleSystemPrompt(
   agentConfig: AgentConfig,
   skills: Skill[],
-  memories: Memory[]
+  memories: Memory[],
 ): string {
   const parts: string[] = [];
 
@@ -50,9 +44,10 @@ function assembleSystemPrompt(
 }
 
 function buildMcpServersConfig(
-  mcpServers: McpServer[]
+  mcpServers: McpServer[],
 ): Record<string, { command: string; args: string[]; env?: Record<string, string> }> {
-  const config: Record<string, { command: string; args: string[]; env?: Record<string, string> }> = {};
+  const config: Record<string, { command: string; args: string[]; env?: Record<string, string> }> =
+    {};
 
   for (const server of mcpServers) {
     if (server.status !== "active") continue;
@@ -70,16 +65,8 @@ export async function runAgentQuery(options: AgentQueryOptions): Promise<{
   agentSessionId: string;
   costUsd: number;
 }> {
-  const {
-    prompt,
-    agentConfig,
-    mcpServers,
-    skills,
-    memories,
-    sessionId,
-    onMessage,
-    signal,
-  } = options;
+  const { prompt, agentConfig, mcpServers, skills, memories, sessionId, onMessage, signal } =
+    options;
 
   const systemPrompt = assembleSystemPrompt(agentConfig, skills, memories);
   const mcpConfig = buildMcpServersConfig(mcpServers);
@@ -127,17 +114,11 @@ export async function runAgentQuery(options: AgentQueryOptions): Promise<{
         case "stream_event": {
           const event = message.event as any;
 
-          if (
-            event.type === "content_block_delta" &&
-            event.delta?.type === "text_delta"
-          ) {
+          if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
             onMessage({ type: "stream_text", text: event.delta.text });
           }
 
-          if (
-            event.type === "content_block_start" &&
-            event.content_block?.type === "tool_use"
-          ) {
+          if (event.type === "content_block_start" && event.content_block?.type === "tool_use") {
             onMessage({
               type: "stream_tool_start",
               tool_name: event.content_block.name,
@@ -145,10 +126,7 @@ export async function runAgentQuery(options: AgentQueryOptions): Promise<{
             });
           }
 
-          if (
-            event.type === "content_block_delta" &&
-            event.delta?.type === "input_json_delta"
-          ) {
+          if (event.type === "content_block_delta" && event.delta?.type === "input_json_delta") {
             onMessage({
               type: "stream_tool_input",
               tool_id: "", // filled from context
@@ -167,7 +145,8 @@ export async function runAgentQuery(options: AgentQueryOptions): Promise<{
           const content = (message as any).message?.content;
           if (content) {
             const textParts: string[] = [];
-            const toolCalls: Array<{ id: string; name: string; input: Record<string, unknown> }> = [];
+            const toolCalls: Array<{ id: string; name: string; input: Record<string, unknown> }> =
+              [];
 
             for (const block of content) {
               if ("text" in block) textParts.push(block.text);

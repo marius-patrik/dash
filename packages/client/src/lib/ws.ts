@@ -5,7 +5,7 @@ const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
 
 export function createChatSocket(
   onMessage: (msg: WsServerMessage) => void,
-  onClose?: () => void
+  onClose?: () => void,
 ): {
   send: (msg: WsClientMessage) => void;
   close: () => void;

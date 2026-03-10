@@ -1,14 +1,13 @@
-
-import { useEffect, useState } from "react";
-import { useParams } from "wouter";
-import { apiGet, apiPatch } from "@/lib/api";
 import type { Skill } from "@dash/shared";
 import { SKILL_CATEGORIES } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Link, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -16,9 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
-import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { apiGet, apiPatch } from "@/lib/api";
 
 export default function EditSkillPage() {
   const params = useParams();
@@ -79,10 +77,7 @@ export default function EditSkillPage() {
           </div>
           <div className="space-y-2">
             <Label>Description</Label>
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <Input value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>Category</Label>

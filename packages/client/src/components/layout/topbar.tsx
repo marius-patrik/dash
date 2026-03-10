@@ -1,5 +1,4 @@
-
-import { useAuth } from "@/providers/auth-provider";
+import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -7,14 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { useAuth } from "@/providers/auth-provider";
 
 export function Topbar() {
   const { user, signOut } = useAuth();
 
-  const initials = user?.email
-    ? user.email.slice(0, 2).toUpperCase()
-    : "U";
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "U";
 
   return (
     <header className="flex items-center justify-between h-14 px-6 border-b border-border bg-card">

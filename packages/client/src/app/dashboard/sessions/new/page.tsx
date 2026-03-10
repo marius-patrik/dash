@@ -1,10 +1,9 @@
-
+import type { AgentConfig, CreateSessionRequest, McpServer, Skill } from "@dash/shared";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useLocation } from "wouter";
-import { apiGet, apiPost } from "@/lib/api";
-import type { AgentConfig, McpServer, Skill, CreateSessionRequest } from "@dash/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { apiGet, apiPost } from "@/lib/api";
 
 export default function NewSessionPage() {
   const [, navigate] = useLocation();
@@ -126,9 +125,7 @@ export default function NewSessionPage() {
                     <input
                       type="checkbox"
                       checked={selectedMcp.includes(server.id)}
-                      onChange={() =>
-                        toggleItem(server.id, selectedMcp, setSelectedMcp)
-                      }
+                      onChange={() => toggleItem(server.id, selectedMcp, setSelectedMcp)}
                       className="rounded"
                     />
                     <div>
@@ -159,16 +156,12 @@ export default function NewSessionPage() {
                     <input
                       type="checkbox"
                       checked={selectedSkills.includes(skill.id)}
-                      onChange={() =>
-                        toggleItem(skill.id, selectedSkills, setSelectedSkills)
-                      }
+                      onChange={() => toggleItem(skill.id, selectedSkills, setSelectedSkills)}
                       className="rounded"
                     />
                     <div>
                       <p className="text-sm font-medium">{skill.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {skill.description}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{skill.description}</p>
                     </div>
                   </label>
                 ))}

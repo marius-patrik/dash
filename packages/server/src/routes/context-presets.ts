@@ -24,47 +24,41 @@ export function registerContextPresetRoutes(app: FastifyInstance) {
     return data;
   });
 
-  app.get<{ Params: { id: string } }>(
-    "/api/context-presets/:id",
-    async (req) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.get<{ Params: { id: string } }>("/api/context-presets/:id", async (req) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { data, error } = await supabase
-        .from("context_presets")
-        .select("*")
-        .eq("id", req.params.id)
-        .eq("user_id", userId)
-        .single();
+    const { data, error } = await supabase
+      .from("context_presets")
+      .select("*")
+      .eq("id", req.params.id)
+      .eq("user_id", userId)
+      .single();
 
-      if (error) throw error;
-      return data;
-    }
-  );
+    if (error) throw error;
+    return data;
+  });
 
-  app.post<{ Body: CreateContextPresetBody }>(
-    "/api/context-presets",
-    async (req) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.post<{ Body: CreateContextPresetBody }>("/api/context-presets", async (req) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { data, error } = await supabase
-        .from("context_presets")
-        .insert({
-          user_id: userId,
-          name: req.body.name,
-          description: req.body.description || "",
-          included_memories: req.body.included_memories || [],
-          included_files: req.body.included_files || [],
-          included_skills: req.body.included_skills || [],
-        })
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from("context_presets")
+      .insert({
+        user_id: userId,
+        name: req.body.name,
+        description: req.body.description || "",
+        included_memories: req.body.included_memories || [],
+        included_files: req.body.included_files || [],
+        included_skills: req.body.included_skills || [],
+      })
+      .select()
+      .single();
 
-      if (error) throw error;
-      return data;
-    }
-  );
+    if (error) throw error;
+    return data;
+  });
 
   app.patch<{ Params: { id: string }; Body: Partial<CreateContextPresetBody> }>(
     "/api/context-presets/:id",
@@ -82,23 +76,20 @@ export function registerContextPresetRoutes(app: FastifyInstance) {
 
       if (error) throw error;
       return data;
-    }
+    },
   );
 
-  app.delete<{ Params: { id: string } }>(
-    "/api/context-presets/:id",
-    async (req, reply) => {
-      const userId = (req as any).userId;
-      const supabase = getSupabaseAdmin();
+  app.delete<{ Params: { id: string } }>("/api/context-presets/:id", async (req, reply) => {
+    const userId = (req as any).userId;
+    const supabase = getSupabaseAdmin();
 
-      const { error } = await supabase
-        .from("context_presets")
-        .delete()
-        .eq("id", req.params.id)
-        .eq("user_id", userId);
+    const { error } = await supabase
+      .from("context_presets")
+      .delete()
+      .eq("id", req.params.id)
+      .eq("user_id", userId);
 
-      if (error) throw error;
-      return reply.status(204).send();
-    }
-  );
+    if (error) throw error;
+    return reply.status(204).send();
+  });
 }

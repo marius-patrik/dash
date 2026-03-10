@@ -6,9 +6,7 @@ let supabaseAdmin: SupabaseClient | null = null;
 export function getSupabaseAdmin(): SupabaseClient {
   if (!supabaseAdmin) {
     if (!config.supabaseUrl || !config.supabaseServiceKey) {
-      throw new Error(
-        "SUPABASE_URL and SUPABASE_SERVICE_KEY are required. Set them in .env"
-      );
+      throw new Error("SUPABASE_URL and SUPABASE_SERVICE_KEY are required. Set them in .env");
     }
     supabaseAdmin = createClient(config.supabaseUrl, config.supabaseServiceKey);
   }

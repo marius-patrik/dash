@@ -1,8 +1,7 @@
-
-import { useState, useRef } from "react";
+import { Send, Square } from "lucide-react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Square } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (content: string) => void;
@@ -11,12 +10,7 @@ interface ChatInputProps {
   disabled?: boolean;
 }
 
-export function ChatInput({
-  onSend,
-  onAbort,
-  isStreaming,
-  disabled,
-}: ChatInputProps) {
+export function ChatInput({ onSend, onAbort, isStreaming, disabled }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -48,12 +42,7 @@ export function ChatInput({
         disabled={disabled}
       />
       {isStreaming ? (
-        <Button
-          variant="destructive"
-          size="icon"
-          onClick={onAbort}
-          className="shrink-0"
-        >
+        <Button variant="destructive" size="icon" onClick={onAbort} className="shrink-0">
           <Square className="h-4 w-4" />
         </Button>
       ) : (

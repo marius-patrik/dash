@@ -1,19 +1,19 @@
-import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
 import {
-  MessageSquare,
   Bot,
-  Server,
-  Sparkles,
   Brain,
   Layers,
-  Settings,
   LayoutDashboard,
+  MessageSquare,
   PanelLeftClose,
   PanelLeftOpen,
+  Server,
+  Settings,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
@@ -34,13 +34,11 @@ export function Sidebar() {
     <aside
       className={cn(
         "flex flex-col border-r border-border bg-card h-screen transition-all duration-200",
-        collapsed ? "w-16" : "w-56"
+        collapsed ? "w-16" : "w-56",
       )}
     >
       <div className="flex items-center justify-between p-4 border-b border-border">
-        {!collapsed && (
-          <h1 className="text-lg font-bold tracking-tight">Dash</h1>
-        )}
+        {!collapsed && <h1 className="text-lg font-bold tracking-tight">Dash</h1>}
         <Button
           variant="ghost"
           size="icon"
@@ -69,7 +67,7 @@ export function Sidebar() {
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               )}
             >
               <item.icon className="h-4 w-4 shrink-0" />

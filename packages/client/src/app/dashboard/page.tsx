@@ -1,17 +1,11 @@
+import type { AgentConfig, McpServer, Session } from "@dash/shared";
+import { Bot, MessageSquare, Plus, Server } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiGet } from "@/lib/api";
-import type { Session, AgentConfig, McpServer } from "@dash/shared";
-import {
-  MessageSquare,
-  Bot,
-  Server,
-  Sparkles,
-  Plus,
-} from "lucide-react";
 
 export default function DashboardPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -81,9 +75,7 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              MCP Servers
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">MCP Servers</CardTitle>
             <Server className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -101,10 +93,7 @@ export default function DashboardPage() {
           {sessions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No sessions yet.{" "}
-              <Link
-                href="/dashboard/sessions/new"
-                className="text-primary hover:underline"
-              >
+              <Link href="/dashboard/sessions/new" className="text-primary hover:underline">
                 Create your first session
               </Link>
             </p>
@@ -121,11 +110,7 @@ export default function DashboardPage() {
                     <span className="text-sm font-medium">{session.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant={
-                        session.status === "active" ? "default" : "secondary"
-                      }
-                    >
+                    <Badge variant={session.status === "active" ? "default" : "secondary"}>
                       {session.status}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
