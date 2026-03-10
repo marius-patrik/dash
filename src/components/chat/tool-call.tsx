@@ -1,7 +1,18 @@
-import type { ToolCallData, ToolResultData } from "@/shared";
 import { CheckCircle2, ChevronDown, ChevronRight, Wrench, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+
+interface ToolCallData {
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+}
+
+interface ToolResultData {
+  tool_use_id: string;
+  content: string;
+  is_error?: boolean;
+}
 
 export function ToolCallView({
   toolCall,
@@ -15,6 +26,7 @@ export function ToolCallView({
   return (
     <div className="w-full rounded-md border border-border bg-card text-sm">
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-2 w-full px-3 py-2 hover:bg-accent transition-colors"
       >

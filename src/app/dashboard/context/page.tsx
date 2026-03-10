@@ -1,6 +1,6 @@
-import type { ContextPreset, Memory, Skill } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { Brain, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,34 +15,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function ContextPresetsPage() {
-  const [presets, setPresets] = useState<ContextPreset[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const presets = useQuery(api.contextPresets.list);
+  const skills = useQuery(api.skills.list);
+  const memories = useQuery(api.memory.list);
+  const createPreset = useMutation(api.contextPresets.create);
+  const updatePreset = useMutation(api.contextPresets.update);
+  const deletePreset = useMutation(api.contextPresets.remove);
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id<"contextPresets"> | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedMemories, setSelectedMemories] = useState<string[]>([]);
-
-  useEffect(() => {
-    Promise.all([
-      apiGet<ContextPreset[]>("/api/context-presets"),
-      apiGet<Skill[]>("/api/skills"),
-      apiGet<Memory[]>("/api/memory"),
-    ])
-      .then(([p, s, m]) => {
-        setPresets(p);
-        setSkills(s);
-        setMemories(m);
-      })
-      .catch(() => toast.error("Failed to load data"))
-      .finally(() => setLoading(false));
-  }, []);
+  const [selectedSkills, setSelectedSkills] = useState<Id<"skills">[]>([]);
+  const [selectedMemories, setSelectedMemories] = useState<Id<"memories">[]>([]);
 
   function resetForm() {
     setName("");
@@ -52,33 +41,36 @@ export default function ContextPresetsPage() {
     setEditingId(null);
   }
 
-  function openEdit(preset: ContextPreset) {
+  function openEdit(preset: NonNullable<typeof presets>[number]) {
     setName(preset.name);
-    setDescription(preset.description);
-    setSelectedSkills(preset.included_skills);
-    setSelectedMemories(preset.included_memories);
-    setEditingId(preset.id);
+    setDescription(preset.description ?? "");
+    setSelectedSkills(preset.includedSkills);
+    setSelectedMemories(preset.includedMemories);
+    setEditingId(preset._id);
     setDialogOpen(true);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const body = {
-        name,
-        description,
-        included_skills: selectedSkills,
-        included_memories: selectedMemories,
-        included_files: [],
-      };
-
       if (editingId) {
-        const updated = await apiPatch<ContextPreset>(`/api/context-presets/${editingId}`, body);
-        setPresets((prev) => prev.map((p) => (p.id === editingId ? updated : p)));
+        await updatePreset({
+          id: editingId,
+          name,
+          description,
+          includedSkills: selectedSkills,
+          includedMemories: selectedMemories,
+          includedFiles: [],
+        });
         toast.success("Preset updated");
       } else {
-        const created = await apiPost<ContextPreset>("/api/context-presets", body);
-        setPresets((prev) => [created, ...prev]);
+        await createPreset({
+          name,
+          description,
+          includedSkills: selectedSkills,
+          includedMemories: selectedMemories,
+          includedFiles: [],
+        });
         toast.success("Preset created");
       }
       setDialogOpen(false);
@@ -88,21 +80,22 @@ export default function ContextPresetsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"contextPresets">) {
     try {
-      await apiDelete(`/api/context-presets/${id}`);
-      setPresets((prev) => prev.filter((p) => p.id !== id));
+      await deletePreset({ id });
       toast.success("Preset deleted");
     } catch {
       toast.error("Failed to delete preset");
     }
   }
 
-  function toggleItem(list: string[], setList: (v: string[]) => void, id: string) {
+  function toggleItem<T extends string>(list: T[], setList: (v: T[]) => void, id: T) {
     setList(list.includes(id) ? list.filter((i) => i !== id) : [...list, id]);
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
+  if (presets === undefined || skills === undefined || memories === undefined) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -153,10 +146,10 @@ export default function ContextPresetsPage() {
                   <div className="flex flex-wrap gap-2">
                     {skills.map((s) => (
                       <Badge
-                        key={s.id}
-                        variant={selectedSkills.includes(s.id) ? "default" : "outline"}
+                        key={s._id}
+                        variant={selectedSkills.includes(s._id) ? "default" : "outline"}
                         className="cursor-pointer"
-                        onClick={() => toggleItem(selectedSkills, setSelectedSkills, s.id)}
+                        onClick={() => toggleItem(selectedSkills, setSelectedSkills, s._id)}
                       >
                         {s.name}
                       </Badge>
@@ -173,10 +166,10 @@ export default function ContextPresetsPage() {
                   <div className="flex flex-wrap gap-2">
                     {memories.map((m) => (
                       <Badge
-                        key={m.id}
-                        variant={selectedMemories.includes(m.id) ? "default" : "outline"}
+                        key={m._id}
+                        variant={selectedMemories.includes(m._id) ? "default" : "outline"}
                         className="cursor-pointer"
-                        onClick={() => toggleItem(selectedMemories, setSelectedMemories, m.id)}
+                        onClick={() => toggleItem(selectedMemories, setSelectedMemories, m._id)}
                       >
                         {m.key}
                       </Badge>
@@ -203,7 +196,7 @@ export default function ContextPresetsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {presets.map((preset) => (
-            <Card key={preset.id}>
+            <Card key={preset._id}>
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
                   <CardTitle className="text-base">{preset.name}</CardTitle>
@@ -224,7 +217,7 @@ export default function ContextPresetsPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(preset.id)}
+                    onClick={() => handleDelete(preset._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -232,21 +225,21 @@ export default function ContextPresetsPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-1">
-                  {preset.included_skills.length > 0 && (
+                  {preset.includedSkills.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       <Sparkles className="h-3 w-3 mr-1" />
-                      {preset.included_skills.length} skill
-                      {preset.included_skills.length !== 1 ? "s" : ""}
+                      {preset.includedSkills.length} skill
+                      {preset.includedSkills.length !== 1 ? "s" : ""}
                     </Badge>
                   )}
-                  {preset.included_memories.length > 0 && (
+                  {preset.includedMemories.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       <Brain className="h-3 w-3 mr-1" />
-                      {preset.included_memories.length} memor
-                      {preset.included_memories.length !== 1 ? "ies" : "y"}
+                      {preset.includedMemories.length} memor
+                      {preset.includedMemories.length !== 1 ? "ies" : "y"}
                     </Badge>
                   )}
-                  {preset.included_skills.length === 0 && preset.included_memories.length === 0 && (
+                  {preset.includedSkills.length === 0 && preset.includedMemories.length === 0 && (
                     <span className="text-xs text-muted-foreground">Empty preset</span>
                   )}
                 </div>

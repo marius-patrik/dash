@@ -1,7 +1,6 @@
-import type { CreateMemoryRequest, Memory } from "@/shared";
-import { MEMORY_CATEGORIES } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { Brain, Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,25 +21,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
+import { MEMORY_CATEGORIES } from "@/lib/constants";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function MemoryPage() {
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const memories = useQuery(api.memory.list);
+  const createMemory = useMutation(api.memory.create);
+  const updateMemory = useMutation(api.memory.update);
+  const deleteMemory = useMutation(api.memory.remove);
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<Id<"memories"> | null>(null);
 
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [category, setCategory] = useState("other");
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    apiGet<Memory[]>("/api/memory")
-      .then(setMemories)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   function resetForm() {
     setKey("");
@@ -53,18 +50,10 @@ export default function MemoryPage() {
     e.preventDefault();
     try {
       if (editingId) {
-        await apiPatch(`/api/memory/${editingId}`, { key, value, category });
-        setMemories((prev) =>
-          prev.map((m) => (m.id === editingId ? { ...m, key, value, category } : m)),
-        );
+        await updateMemory({ id: editingId, key, value, category });
         toast.success("Memory updated");
       } else {
-        const mem = await apiPost<Memory>("/api/memory", {
-          key,
-          value,
-          category,
-        } satisfies CreateMemoryRequest);
-        setMemories((prev) => [...prev, mem]);
+        await createMemory({ key, value, category });
         toast.success("Memory added");
       }
       setDialogOpen(false);
@@ -74,25 +63,28 @@ export default function MemoryPage() {
     }
   }
 
-  function handleEdit(mem: Memory) {
-    setEditingId(mem.id);
+  function handleEdit(mem: (typeof filteredMemories)[number]) {
+    setEditingId(mem._id);
     setKey(mem.key);
     setValue(mem.value);
     setCategory(mem.category);
     setDialogOpen(true);
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"memories">) {
     try {
-      await apiDelete(`/api/memory/${id}`);
-      setMemories((prev) => prev.filter((m) => m.id !== id));
+      await deleteMemory({ id });
       toast.success("Memory deleted");
     } catch {
       toast.error("Failed to delete");
     }
   }
 
-  const filtered = searchQuery
+  if (memories === undefined) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
+
+  const filteredMemories = searchQuery
     ? memories.filter(
         (m) =>
           m.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -101,17 +93,15 @@ export default function MemoryPage() {
     : memories;
 
   // Group by category
-  const grouped = filtered.reduce(
+  const grouped = filteredMemories.reduce(
     (acc, mem) => {
       const cat = mem.category || "other";
       if (!acc[cat]) acc[cat] = [];
       acc[cat].push(mem);
       return acc;
     },
-    {} as Record<string, Memory[]>,
+    {} as Record<string, typeof filteredMemories>,
   );
-
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -201,7 +191,7 @@ export default function MemoryPage() {
               {cat}
             </h2>
             {mems.map((mem) => (
-              <Card key={mem.id}>
+              <Card key={mem._id}>
                 <CardContent className="flex items-start justify-between py-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{mem.key}</p>
@@ -222,7 +212,7 @@ export default function MemoryPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleDelete(mem.id)}
+                      onClick={() => handleDelete(mem._id)}
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>

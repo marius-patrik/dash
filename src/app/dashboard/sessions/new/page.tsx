@@ -1,5 +1,5 @@
-import type { AgentConfig, CreateSessionRequest, McpServer, Skill } from "@/shared";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -13,49 +13,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { apiGet, apiPost } from "@/lib/api";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function NewSessionPage() {
   const [, navigate] = useLocation();
   const [name, setName] = useState("");
   const [agentConfigId, setAgentConfigId] = useState("");
-  const [selectedMcp, setSelectedMcp] = useState<string[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedMcp, setSelectedMcp] = useState<Id<"mcpServers">[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<Id<"skills">[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [agents, setAgents] = useState<AgentConfig[]>([]);
-  const [mcpServers, setMcpServers] = useState<McpServer[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
+  const agents = useQuery(api.agents.list);
+  const mcpServers = useQuery(api.mcp.list);
+  const skills = useQuery(api.skills.list);
+  const createSession = useMutation(api.sessions.create);
 
-  useEffect(() => {
-    Promise.all([
-      apiGet<AgentConfig[]>("/api/agents").catch(() => []),
-      apiGet<McpServer[]>("/api/mcp").catch(() => []),
-      apiGet<Skill[]>("/api/skills").catch(() => []),
-    ]).then(([a, m, s]) => {
-      setAgents(a);
-      setMcpServers(m);
-      setSkills(s);
-      // Auto-select default agent
-      const defaultAgent = a.find((ag) => ag.is_default) || a[0];
-      if (defaultAgent) setAgentConfigId(defaultAgent.id);
-    });
-  }, []);
+  // Auto-select default agent once agents load
+  const defaultAgentId =
+    agentConfigId || (agents ? (agents.find((a) => a.isDefault) || agents[0])?._id : undefined);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !agentConfigId) return;
+    const selectedAgent = defaultAgentId || agentConfigId;
+    if (!name.trim() || !selectedAgent) return;
 
     setLoading(true);
     try {
-      const session = await apiPost<{ id: string }>("/api/sessions", {
+      const sessionId = await createSession({
         name: name.trim(),
-        agent_config_id: agentConfigId,
-        mcp_server_ids: selectedMcp,
-        skill_ids: selectedSkills,
-      } satisfies CreateSessionRequest);
+        agentConfigId: selectedAgent as Id<"agentConfigs">,
+        mcpServerIds: selectedMcp,
+        skillIds: selectedSkills,
+      });
 
-      navigate(`/dashboard/sessions/${session.id}`);
+      navigate(`/dashboard/sessions/${sessionId}`);
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -63,8 +55,12 @@ export default function NewSessionPage() {
     }
   }
 
-  function toggleItem(id: string, list: string[], setList: (v: string[]) => void) {
+  function toggleItem<T extends string>(id: T, list: T[], setList: (v: T[]) => void) {
     setList(list.includes(id) ? list.filter((i) => i !== id) : [...list, id]);
+  }
+
+  if (agents === undefined || mcpServers === undefined || skills === undefined) {
+    return <div className="text-muted-foreground">Loading...</div>;
   }
 
   return (
@@ -89,13 +85,16 @@ export default function NewSessionPage() {
             </div>
             <div className="space-y-2">
               <Label>Agent Configuration</Label>
-              <Select value={agentConfigId} onValueChange={(v) => v && setAgentConfigId(v)}>
+              <Select
+                value={agentConfigId || (defaultAgentId as string) || ""}
+                onValueChange={(v) => v && setAgentConfigId(v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select an agent config" />
                 </SelectTrigger>
                 <SelectContent>
                   {agents.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
+                    <SelectItem key={a._id} value={a._id}>
                       {a.name} ({a.model})
                     </SelectItem>
                   ))}
@@ -119,13 +118,13 @@ export default function NewSessionPage() {
               <div className="space-y-2">
                 {mcpServers.map((server) => (
                   <label
-                    key={server.id}
+                    key={server._id}
                     className="flex items-center gap-3 p-2 rounded hover:bg-accent cursor-pointer"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedMcp.includes(server.id)}
-                      onChange={() => toggleItem(server.id, selectedMcp, setSelectedMcp)}
+                      checked={selectedMcp.includes(server._id)}
+                      onChange={() => toggleItem(server._id, selectedMcp, setSelectedMcp)}
                       className="rounded"
                     />
                     <div>
@@ -150,13 +149,13 @@ export default function NewSessionPage() {
               <div className="space-y-2">
                 {skills.map((skill) => (
                   <label
-                    key={skill.id}
+                    key={skill._id}
                     className="flex items-center gap-3 p-2 rounded hover:bg-accent cursor-pointer"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedSkills.includes(skill.id)}
-                      onChange={() => toggleItem(skill.id, selectedSkills, setSelectedSkills)}
+                      checked={selectedSkills.includes(skill._id)}
+                      onChange={() => toggleItem(skill._id, selectedSkills, setSelectedSkills)}
                       className="rounded"
                     />
                     <div>
@@ -170,7 +169,11 @@ export default function NewSessionPage() {
           </Card>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading || !agentConfigId}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading || !(agentConfigId || defaultAgentId)}
+        >
           {loading ? "Creating..." : "Create Session"}
         </Button>
       </form>

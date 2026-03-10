@@ -1,7 +1,6 @@
-import type { CreateSkillRequest, Skill } from "@/shared";
-import { SKILL_CATEGORIES } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { Plus, Sparkles, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
@@ -24,36 +23,31 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { apiDelete, apiGet, apiPost } from "@/lib/api";
+import { SKILL_CATEGORIES } from "@/lib/constants";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function SkillsPage() {
   const [, navigate] = useLocation();
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const skills = useQuery(api.skills.list);
+  const createSkill = useMutation(api.skills.create);
+  const removeSkill = useMutation(api.skills.remove);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("other");
 
-  useEffect(() => {
-    apiGet<Skill[]>("/api/skills")
-      .then(setSkills)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const skill = await apiPost<Skill>("/api/skills", {
+      await createSkill({
         name,
         description,
         content,
         category,
-      } satisfies CreateSkillRequest);
-      setSkills((prev) => [...prev, skill]);
+      });
       setDialogOpen(false);
       setName("");
       setDescription("");
@@ -64,17 +58,16 @@ export default function SkillsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"skills">) {
     try {
-      await apiDelete(`/api/skills/${id}`);
-      setSkills((prev) => prev.filter((s) => s.id !== id));
+      await removeSkill({ id });
       toast.success("Skill deleted");
     } catch {
       toast.error("Failed to delete");
     }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
+  if (skills === undefined) return <div className="text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -153,7 +146,7 @@ export default function SkillsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {skills.map((skill) => (
-            <Card key={skill.id}>
+            <Card key={skill._id}>
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
                   <CardTitle className="text-base">{skill.name}</CardTitle>
@@ -170,7 +163,7 @@ export default function SkillsPage() {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => handleDelete(skill.id)}
+                  onClick={() => handleDelete(skill._id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -183,7 +176,7 @@ export default function SkillsPage() {
                 <Button
                   variant="link"
                   className="px-0 mt-2 text-xs"
-                  onClick={() => navigate(`/dashboard/skills/${skill.id}`)}
+                  onClick={() => navigate(`/dashboard/skills/${skill._id}`)}
                 >
                   Edit
                 </Button>

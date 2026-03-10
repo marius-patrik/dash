@@ -1,43 +1,33 @@
-import type { Message, Session } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { CheckCircle2, GitFork, Pause, Play } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useParams } from "wouter";
 import { ChatView } from "@/components/chat/chat-view";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { apiGet, apiPatch, apiPost } from "@/lib/api";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function SessionPage() {
   const params = useParams();
   const [, navigate] = useLocation();
   const sessionId = params.id as string;
-  const [session, setSession] = useState<Session | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiGet<{ session: Session; messages: Message[] }>(`/api/sessions/${sessionId}`)
-      .then((data) => {
-        setSession(data.session);
-        setMessages(data.messages);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [sessionId]);
+  const session = useQuery(api.sessions.get, { id: sessionId as Id<"sessions"> });
+  const createSession = useMutation(api.sessions.create);
+  const updateSession = useMutation(api.sessions.update);
 
   async function handleFork() {
     if (!session) return;
     try {
-      const forked = await apiPost<Session>("/api/sessions", {
+      const forkedId = await createSession({
         name: `${session.name} (fork)`,
-        agent_config_id: session.agent_config_id,
-        mcp_server_ids: session.mcp_server_ids,
-        skill_ids: session.skill_ids,
+        agentConfigId: session.agentConfigId as Id<"agentConfigs">,
+        mcpServerIds: session.mcpServerIds,
+        skillIds: session.skillIds,
         tags: [...session.tags, "forked"],
       });
       toast.success("Session forked");
-      navigate(`/dashboard/sessions/${forked.id}`);
+      navigate(`/dashboard/sessions/${forkedId}`);
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -46,19 +36,18 @@ export default function SessionPage() {
   async function handleStatusChange(status: "active" | "paused" | "completed") {
     if (!session) return;
     try {
-      await apiPatch(`/api/sessions/${sessionId}`, { status });
-      setSession({ ...session, status });
+      await updateSession({ id: session._id, status });
       toast.success(`Session ${status}`);
     } catch {
       toast.error("Failed to update status");
     }
   }
 
-  if (loading) {
+  if (session === undefined) {
     return <div className="text-muted-foreground">Loading session...</div>;
   }
 
-  if (!session) {
+  if (session === null) {
     return <div className="text-destructive">Session not found</div>;
   }
 
@@ -95,7 +84,7 @@ export default function SessionPage() {
         </div>
       </div>
       <div className="flex-1 min-h-0">
-        <ChatView sessionId={sessionId} initialMessages={messages} />
+        <ChatView sessionId={sessionId} />
       </div>
     </div>
   );

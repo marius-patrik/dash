@@ -1,7 +1,6 @@
-import type { Skill } from "@/shared";
-import { SKILL_CATEGORIES } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -16,15 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { apiGet, apiPatch } from "@/lib/api";
+import { SKILL_CATEGORIES } from "@/lib/constants";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function EditSkillPage() {
   const [, navigate] = useLocation();
   const params = useParams();
-  const id = params.id as string;
+  const skillId = params.id as string;
 
-  const [skill, setSkill] = useState<Skill | null>(null);
-  const [loading, setLoading] = useState(true);
+  const skill = useQuery(api.skills.get, { id: skillId as Id<"skills"> });
+  const updateSkill = useMutation(api.skills.update);
+  const initialized = useRef(false);
+
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -32,22 +35,25 @@ export default function EditSkillPage() {
   const [category, setCategory] = useState("other");
 
   useEffect(() => {
-    apiGet<Skill>(`/api/skills/${id}`)
-      .then((s) => {
-        setSkill(s);
-        setName(s.name);
-        setDescription(s.description);
-        setContent(s.content);
-        setCategory(s.category);
-      })
-      .catch(() => toast.error("Failed to load skill"))
-      .finally(() => setLoading(false));
-  }, [id]);
+    if (skill && !initialized.current) {
+      initialized.current = true;
+      setName(skill.name);
+      setDescription(skill.description);
+      setContent(skill.content);
+      setCategory(skill.category);
+    }
+  }, [skill]);
 
   async function handleSave() {
     setSaving(true);
     try {
-      await apiPatch(`/api/skills/${id}`, { name, description, content, category });
+      await updateSkill({
+        id: skillId as Id<"skills">,
+        name,
+        description,
+        content,
+        category,
+      });
       toast.success("Saved");
     } catch (err: any) {
       toast.error(err.message);
@@ -56,8 +62,8 @@ export default function EditSkillPage() {
     }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
-  if (!skill) return <div className="text-destructive">Not found</div>;
+  if (skill === undefined) return <div className="text-muted-foreground">Loading...</div>;
+  if (skill === null) return <div className="text-destructive">Not found</div>;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

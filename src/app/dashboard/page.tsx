@@ -1,29 +1,20 @@
-import type { AgentConfig, McpServer, Session } from "@/shared";
+import { useQuery } from "convex/react";
 import { Bot, MessageSquare, Plus, Server } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { apiGet } from "@/lib/api";
+import { api } from "../../../convex/_generated/api";
 
 export default function DashboardPage() {
   const [, navigate] = useLocation();
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [agents, setAgents] = useState<AgentConfig[]>([]);
-  const [mcpServers, setMcpServers] = useState<McpServer[]>([]);
+  const sessions = useQuery(api.sessions.list);
+  const agents = useQuery(api.agents.list);
+  const mcpServers = useQuery(api.mcp.list);
 
-  useEffect(() => {
-    Promise.all([
-      apiGet<Session[]>("/api/sessions").catch(() => []),
-      apiGet<AgentConfig[]>("/api/agents").catch(() => []),
-      apiGet<McpServer[]>("/api/mcp").catch(() => []),
-    ]).then(([s, a, m]) => {
-      setSessions(s);
-      setAgents(a);
-      setMcpServers(m);
-    });
-  }, []);
+  if (sessions === undefined || agents === undefined || mcpServers === undefined) {
+    return <div className="text-muted-foreground">Loading...</div>;
+  }
 
   const activeSessions = sessions.filter((s) => s.status === "active");
 
@@ -100,8 +91,8 @@ export default function DashboardPage() {
             <div className="space-y-2">
               {sessions.slice(0, 5).map((session) => (
                 <Link
-                  key={session.id}
-                  href={`/dashboard/sessions/${session.id}`}
+                  key={session._id}
+                  href={`/dashboard/sessions/${session._id}`}
                   className="flex items-center justify-between p-3 rounded-md hover:bg-accent transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -113,7 +104,7 @@ export default function DashboardPage() {
                       {session.status}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(session.updated_at).toLocaleDateString()}
+                      {new Date(session._creationTime).toLocaleDateString()}
                     </span>
                   </div>
                 </Link>

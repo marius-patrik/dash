@@ -1,7 +1,6 @@
-import type { AgentConfig } from "@/shared";
-import { AVAILABLE_MODELS } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -18,18 +17,20 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { apiGet, apiPatch } from "@/lib/api";
+import { AVAILABLE_MODELS } from "@/lib/constants";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function EditAgentPage() {
   const [, navigate] = useLocation();
   const params = useParams();
-  const id = params.id as string;
+  const agentId = params.id as string;
 
-  const [agent, setAgent] = useState<AgentConfig | null>(null);
-  const [loading, setLoading] = useState(true);
+  const agent = useQuery(api.agents.get, { id: agentId as Id<"agentConfigs"> });
+  const updateAgent = useMutation(api.agents.update);
+  const initialized = useRef(false);
+
   const [saving, setSaving] = useState(false);
-
-  // Form state
   const [name, setName] = useState("");
   const [model, setModel] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
@@ -38,29 +39,27 @@ export default function EditAgentPage() {
   const [isDefault, setIsDefault] = useState(false);
 
   useEffect(() => {
-    apiGet<AgentConfig>(`/api/agents/${id}`)
-      .then((a) => {
-        setAgent(a);
-        setName(a.name);
-        setModel(a.model);
-        setSystemPrompt(a.system_prompt);
-        setMaxTurns(a.parameters?.max_turns || 25);
-        setMaxBudget(a.parameters?.max_budget_usd || 5);
-        setIsDefault(a.is_default);
-      })
-      .catch(() => toast.error("Failed to load agent config"))
-      .finally(() => setLoading(false));
-  }, [id]);
+    if (agent && !initialized.current) {
+      initialized.current = true;
+      setName(agent.name);
+      setModel(agent.model);
+      setSystemPrompt(agent.systemPrompt);
+      setMaxTurns(agent.parameters?.maxTurns || 25);
+      setMaxBudget(agent.parameters?.maxBudgetUsd || 5);
+      setIsDefault(agent.isDefault);
+    }
+  }, [agent]);
 
   async function handleSave() {
     setSaving(true);
     try {
-      await apiPatch(`/api/agents/${id}`, {
+      await updateAgent({
+        id: agentId as Id<"agentConfigs">,
         name,
         model,
-        system_prompt: systemPrompt,
-        parameters: { max_turns: maxTurns, max_budget_usd: maxBudget },
-        is_default: isDefault,
+        systemPrompt,
+        parameters: { maxTurns, maxBudgetUsd: maxBudget },
+        isDefault,
       });
       toast.success("Saved");
     } catch (err: any) {
@@ -70,8 +69,8 @@ export default function EditAgentPage() {
     }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
-  if (!agent) return <div className="text-destructive">Not found</div>;
+  if (agent === undefined) return <div className="text-muted-foreground">Loading...</div>;
+  if (agent === null) return <div className="text-destructive">Not found</div>;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

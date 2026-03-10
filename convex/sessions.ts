@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { getCurrentUserOrThrow } from "./users";
 
 // --- Queries ---

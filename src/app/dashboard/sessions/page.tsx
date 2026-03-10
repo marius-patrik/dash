@@ -1,36 +1,28 @@
-import type { Session } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { apiDelete, apiGet } from "@/lib/api";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function SessionsPage() {
   const [, navigate] = useLocation();
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const sessions = useQuery(api.sessions.list);
+  const removeSession = useMutation(api.sessions.remove);
 
-  useEffect(() => {
-    apiGet<Session[]>("/api/sessions")
-      .then(setSessions)
-      .catch(() => toast.error("Failed to load sessions"))
-      .finally(() => setLoading(false));
-  }, []);
-
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"sessions">) {
     try {
-      await apiDelete(`/api/sessions/${id}`);
-      setSessions((prev) => prev.filter((s) => s.id !== id));
+      await removeSession({ id });
       toast.success("Session deleted");
     } catch {
       toast.error("Failed to delete session");
     }
   }
 
-  if (loading) {
+  if (sessions === undefined) {
     return <div className="text-muted-foreground">Loading sessions...</div>;
   }
 
@@ -54,17 +46,17 @@ export default function SessionsPage() {
       ) : (
         <div className="space-y-2">
           {sessions.map((session) => (
-            <Card key={session.id} className="hover:bg-accent/50 transition-colors">
+            <Card key={session._id} className="hover:bg-accent/50 transition-colors">
               <CardContent className="flex items-center justify-between py-4">
                 <Link
-                  href={`/dashboard/sessions/${session.id}`}
+                  href={`/dashboard/sessions/${session._id}`}
                   className="flex items-center gap-3 flex-1"
                 >
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="font-medium text-sm">{session.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(session.updated_at).toLocaleString()}
+                      {new Date(session._creationTime).toLocaleString()}
                     </p>
                   </div>
                 </Link>
@@ -81,7 +73,7 @@ export default function SessionsPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(session.id)}
+                    onClick={() => handleDelete(session._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

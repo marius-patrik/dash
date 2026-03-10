@@ -1,6 +1,6 @@
-import type { CreateMcpServerRequest, McpServer } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { Plus, Power, PowerOff, Server, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
+import { api } from "../../../../convex/_generated/api";
+import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 
 export default function McpPage() {
-  const [servers, setServers] = useState<McpServer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const servers = useQuery(api.mcp.list);
+  const createServer = useMutation(api.mcp.create);
+  const updateServer = useMutation(api.mcp.update);
+  const removeServer = useMutation(api.mcp.remove);
+
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Form
@@ -26,13 +30,6 @@ export default function McpPage() {
   const [command, setCommand] = useState("");
   const [args, setArgs] = useState("");
   const [envVars, setEnvVars] = useState("");
-
-  useEffect(() => {
-    apiGet<McpServer[]>("/api/mcp")
-      .then(setServers)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -45,15 +42,14 @@ export default function McpPage() {
         }
       }
 
-      const server = await apiPost<McpServer>("/api/mcp", {
+      await createServer({
         name,
         type: "stdio",
         command,
         args: args.split(" ").filter(Boolean),
-        env_vars: envObj,
-      } satisfies CreateMcpServerRequest);
+        envVars: envObj,
+      });
 
-      setServers((prev) => [...prev, server]);
       setDialogOpen(false);
       setName("");
       setCommand("");
@@ -65,27 +61,25 @@ export default function McpPage() {
     }
   }
 
-  async function toggleStatus(server: McpServer) {
+  async function toggleStatus(server: Doc<"mcpServers">) {
     const newStatus = server.status === "active" ? "inactive" : "active";
     try {
-      await apiPatch(`/api/mcp/${server.id}`, { status: newStatus } as any);
-      setServers((prev) => prev.map((s) => (s.id === server.id ? { ...s, status: newStatus } : s)));
+      await updateServer({ id: server._id, status: newStatus });
     } catch {
       toast.error("Failed to update status");
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"mcpServers">) {
     try {
-      await apiDelete(`/api/mcp/${id}`);
-      setServers((prev) => prev.filter((s) => s.id !== id));
+      await removeServer({ id });
       toast.success("MCP server removed");
     } catch {
       toast.error("Failed to delete");
     }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
+  if (servers === undefined) return <div className="text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -155,7 +149,7 @@ export default function McpPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {servers.map((server) => (
-            <Card key={server.id}>
+            <Card key={server._id}>
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
                   <CardTitle className="text-base">{server.name}</CardTitle>
@@ -183,7 +177,7 @@ export default function McpPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(server.id)}
+                    onClick={() => handleDelete(server._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

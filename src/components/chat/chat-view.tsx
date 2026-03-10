@@ -1,6 +1,5 @@
-import type { Message } from "@/shared";
 import { Bot } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/lib/hooks/use-chat";
 import { ChatInput } from "./input";
@@ -9,37 +8,13 @@ import { StreamingToolCall } from "./tool-call";
 
 interface ChatViewProps {
   sessionId: string;
-  initialMessages?: Message[];
 }
 
-export function ChatView({ sessionId, initialMessages = [] }: ChatViewProps) {
-  const {
-    messages,
-    streamingText,
-    activeTools,
-    isStreaming,
-    error,
-    sendMessage,
-    abort,
-    connect,
-    setMessages,
-  } = useChat(sessionId);
+export function ChatView({ sessionId }: ChatViewProps) {
+  const { messages, streamingText, activeTools, isStreaming, error, sendMessage, abort } =
+    useChat(sessionId);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (initialMessages.length > 0) {
-      setMessages(initialMessages);
-    }
-    connect();
-  }, [connect, initialMessages, setMessages]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -54,7 +29,7 @@ export function ChatView({ sessionId, initialMessages = [] }: ChatViewProps) {
           )}
 
           {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
+            <ChatMessage key={msg._id} message={msg} />
           ))}
 
           {/* Streaming text */}

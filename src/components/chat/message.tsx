@@ -1,11 +1,11 @@
-import type { Message } from "@/shared";
 import { Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import type { Doc } from "../../../convex/_generated/dataModel";
 import { ToolCallView } from "./tool-call";
 
-export function ChatMessage({ message }: { message: Message }) {
+export function ChatMessage({ message }: { message: Doc<"messages"> }) {
   const isUser = message.role === "user";
 
   return (
@@ -55,11 +55,11 @@ export function ChatMessage({ message }: { message: Message }) {
           </div>
         )}
 
-        {message.tool_calls?.map((tc) => (
+        {message.toolCalls?.map((tc: any) => (
           <ToolCallView
             key={tc.id}
             toolCall={tc}
-            result={message.tool_results?.find((r) => r.tool_use_id === tc.id)}
+            result={message.toolResults?.find((r: any) => r.tool_use_id === tc.id)}
           />
         ))}
       </div>

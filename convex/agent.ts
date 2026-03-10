@@ -2,8 +2,8 @@
 
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import { v } from "convex/values";
-import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { internalAction } from "./_generated/server";
 
 export const runAgent = internalAction({
   args: {
@@ -44,7 +44,10 @@ export const runAgent = internalAction({
     const systemPrompt = promptParts.join("\n");
 
     // Build MCP config
-    const mcpConfig: Record<string, { command: string; args: string[]; env?: Record<string, string> }> = {};
+    const mcpConfig: Record<
+      string,
+      { command: string; args: string[]; env?: Record<string, string> }
+    > = {};
     for (const server of mcpServers) {
       if (server.status !== "active") continue;
       mcpConfig[server.name] = {

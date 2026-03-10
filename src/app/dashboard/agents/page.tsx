@@ -1,7 +1,6 @@
-import type { AgentConfig, CreateAgentConfigRequest } from "@/shared";
-import { AVAILABLE_MODELS } from "@/shared";
+import { useMutation, useQuery } from "convex/react";
 import { Bot, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
@@ -24,33 +23,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { apiDelete, apiGet, apiPost } from "@/lib/api";
+import { AVAILABLE_MODELS } from "@/lib/constants";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function AgentsPage() {
   const [, navigate] = useLocation();
-  const [agents, setAgents] = useState<AgentConfig[]>([]);
-  const [loading, setLoading] = useState(true);
+  const agents = useQuery(api.agents.list);
+  const createAgent = useMutation(api.agents.create);
+  const removeAgent = useMutation(api.agents.remove);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [model, setModel] = useState(AVAILABLE_MODELS[1].id);
   const [systemPrompt, setSystemPrompt] = useState("");
 
-  useEffect(() => {
-    apiGet<AgentConfig[]>("/api/agents")
-      .then(setAgents)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const agent = await apiPost<AgentConfig>("/api/agents", {
+      await createAgent({
         name,
         model,
-        system_prompt: systemPrompt,
-      } satisfies CreateAgentConfigRequest);
-      setAgents((prev) => [agent, ...prev]);
+        systemPrompt,
+      });
       setDialogOpen(false);
       setName("");
       setSystemPrompt("");
@@ -60,17 +55,16 @@ export default function AgentsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: Id<"agentConfigs">) {
     try {
-      await apiDelete(`/api/agents/${id}`);
-      setAgents((prev) => prev.filter((a) => a.id !== id));
+      await removeAgent({ id });
       toast.success("Agent config deleted");
     } catch {
       toast.error("Failed to delete");
     }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading...</div>;
+  if (agents === undefined) return <div className="text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -139,7 +133,7 @@ export default function AgentsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {agents.map((agent) => (
-            <Card key={agent.id}>
+            <Card key={agent._id}>
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
                   <CardTitle className="text-base">{agent.name}</CardTitle>
@@ -148,7 +142,7 @@ export default function AgentsPage() {
                   </Badge>
                 </div>
                 <div className="flex gap-1">
-                  {agent.is_default && (
+                  {agent.isDefault && (
                     <Badge variant="default" className="text-xs">
                       default
                     </Badge>
@@ -157,7 +151,7 @@ export default function AgentsPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(agent.id)}
+                    onClick={() => handleDelete(agent._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -165,13 +159,13 @@ export default function AgentsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground line-clamp-2">
-                  {agent.system_prompt || "No system prompt"}
+                  {agent.systemPrompt || "No system prompt"}
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  onClick={() => navigate(`/dashboard/agents/${agent.id}`)}
+                  onClick={() => navigate(`/dashboard/agents/${agent._id}`)}
                 >
                   Edit Configuration
                 </Button>
