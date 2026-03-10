@@ -62,15 +62,7 @@ function AuthenticatedApp() {
     );
   }
 
-  return (
-    <Switch>
-      <Route path="/dashboard/:rest*" component={DashboardRoutes} />
-      <Route path="/dashboard" component={DashboardRoutes} />
-      <Route>
-        <Redirect href="/dashboard" replace />
-      </Route>
-    </Switch>
-  );
+  return <DashboardRoutes />;
 }
 
 export function AppRouter() {
