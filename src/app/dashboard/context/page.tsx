@@ -1,4 +1,4 @@
-import type { ContextPreset, Memory, Skill } from "@dash/shared";
+import type { ContextPreset, Memory, Skill } from "@/shared";
 import { Brain, Layers, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

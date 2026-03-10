@@ -1,5 +1,5 @@
-import type { CreateSkillRequest, Skill } from "@dash/shared";
-import { SKILL_CATEGORIES } from "@dash/shared";
+import type { CreateSkillRequest, Skill } from "@/shared";
+import { SKILL_CATEGORIES } from "@/shared";
 import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

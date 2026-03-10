@@ -1,5 +1,5 @@
-import type { CreateMemoryRequest, Memory } from "@dash/shared";
-import { MEMORY_CATEGORIES } from "@dash/shared";
+import type { CreateMemoryRequest, Memory } from "@/shared";
+import { MEMORY_CATEGORIES } from "@/shared";
 import { Brain, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

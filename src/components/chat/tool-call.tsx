@@ -1,4 +1,4 @@
-import type { ToolCallData, ToolResultData } from "@dash/shared";
+import type { ToolCallData, ToolResultData } from "@/shared";
 import { CheckCircle2, ChevronDown, ChevronRight, Wrench, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";

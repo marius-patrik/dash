@@ -1,4 +1,4 @@
-import type { Message } from "@dash/shared";
+import type { Message } from "@/shared";
 import { Bot } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";

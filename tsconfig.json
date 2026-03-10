@@ -12,7 +12,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@dash/shared": ["./src/shared/index.ts"]
     }
   },
   "include": ["src", "convex"],

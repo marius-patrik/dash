@@ -1,4 +1,4 @@
-import type { Session } from "@dash/shared";
+import type { Session } from "@/shared";
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

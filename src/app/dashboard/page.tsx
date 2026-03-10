@@ -1,4 +1,4 @@
-import type { AgentConfig, McpServer, Session } from "@dash/shared";
+import type { AgentConfig, McpServer, Session } from "@/shared";
 import { Bot, MessageSquare, Plus, Server } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";

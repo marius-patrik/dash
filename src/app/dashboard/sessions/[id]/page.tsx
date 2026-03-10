@@ -1,4 +1,4 @@
-import type { Message, Session } from "@dash/shared";
+import type { Message, Session } from "@/shared";
 import { CheckCircle2, GitFork, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

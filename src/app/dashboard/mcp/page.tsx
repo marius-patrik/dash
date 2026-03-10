@@ -1,4 +1,4 @@
-import type { CreateMcpServerRequest, McpServer } from "@dash/shared";
+import type { CreateMcpServerRequest, McpServer } from "@/shared";
 import { Plus, Power, PowerOff, Server, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

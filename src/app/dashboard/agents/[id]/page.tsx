@@ -1,5 +1,5 @@
-import type { AgentConfig } from "@dash/shared";
-import { AVAILABLE_MODELS } from "@dash/shared";
+import type { AgentConfig } from "@/shared";
+import { AVAILABLE_MODELS } from "@/shared";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

@@ -1,4 +1,4 @@
-import type { AgentConfig, CreateSessionRequest, McpServer, Skill } from "@dash/shared";
+import type { AgentConfig, CreateSessionRequest, McpServer, Skill } from "@/shared";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";

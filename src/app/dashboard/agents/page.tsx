@@ -1,5 +1,5 @@
-import type { AgentConfig, CreateAgentConfigRequest } from "@dash/shared";
-import { AVAILABLE_MODELS } from "@dash/shared";
+import type { AgentConfig, CreateAgentConfigRequest } from "@/shared";
+import { AVAILABLE_MODELS } from "@/shared";
 import { Bot, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

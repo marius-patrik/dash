@@ -1,5 +1,5 @@
-import type { Skill } from "@dash/shared";
-import { SKILL_CATEGORIES } from "@dash/shared";
+import type { Skill } from "@/shared";
+import { SKILL_CATEGORIES } from "@/shared";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
