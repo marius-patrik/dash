@@ -1,13 +1,14 @@
 import type { AgentConfig, McpServer, Session } from "@dash/shared";
 import { Bot, MessageSquare, Plus, Server } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiGet } from "@/lib/api";
 
 export default function DashboardPage() {
+  const [, navigate] = useLocation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [agents, setAgents] = useState<AgentConfig[]>([]);
   const [mcpServers, setMcpServers] = useState<McpServer[]>([]);
@@ -30,12 +31,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Link href="/dashboard/sessions/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Session
-          </Button>
-        </Link>
+        <Button onClick={() => navigate("/dashboard/sessions/new")}>
+          <Plus className="h-4 w-4 mr-2" />
+          New Session
+        </Button>
       </div>
 
       {/* Stats */}

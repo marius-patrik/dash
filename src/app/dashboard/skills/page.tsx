@@ -3,7 +3,7 @@ import { SKILL_CATEGORIES } from "@dash/shared";
 import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiDelete, apiGet, apiPost } from "@/lib/api";
 
 export default function SkillsPage() {
+  const [, navigate] = useLocation();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -179,11 +180,13 @@ export default function SkillsPage() {
                 <p className="text-xs text-muted-foreground line-clamp-3 font-mono">
                   {skill.content}
                 </p>
-                <Link href={`/dashboard/skills/${skill.id}`}>
-                  <Button variant="link" className="px-0 mt-2 text-xs">
-                    Edit
-                  </Button>
-                </Link>
+                <Button
+                  variant="link"
+                  className="px-0 mt-2 text-xs"
+                  onClick={() => navigate(`/dashboard/skills/${skill.id}`)}
+                >
+                  Edit
+                </Button>
               </CardContent>
             </Card>
           ))}

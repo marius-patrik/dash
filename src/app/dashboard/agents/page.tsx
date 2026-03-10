@@ -3,7 +3,7 @@ import { AVAILABLE_MODELS } from "@dash/shared";
 import { Bot, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiDelete, apiGet, apiPost } from "@/lib/api";
 
 export default function AgentsPage() {
+  const [, navigate] = useLocation();
   const [agents, setAgents] = useState<AgentConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -166,11 +167,14 @@ export default function AgentsPage() {
                 <p className="text-sm text-muted-foreground line-clamp-2">
                   {agent.system_prompt || "No system prompt"}
                 </p>
-                <Link href={`/dashboard/agents/${agent.id}`}>
-                  <Button variant="outline" size="sm" className="mt-2">
-                    Edit Configuration
-                  </Button>
-                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => navigate(`/dashboard/agents/${agent.id}`)}
+                >
+                  Edit Configuration
+                </Button>
               </CardContent>
             </Card>
           ))}

@@ -2,13 +2,14 @@ import type { Session } from "@dash/shared";
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiDelete, apiGet } from "@/lib/api";
 
 export default function SessionsPage() {
+  const [, navigate] = useLocation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,12 +38,10 @@ export default function SessionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Sessions</h1>
-        <Link href="/dashboard/sessions/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Session
-          </Button>
-        </Link>
+        <Button onClick={() => navigate("/dashboard/sessions/new")}>
+          <Plus className="h-4 w-4 mr-2" />
+          New Session
+        </Button>
       </div>
 
       {sessions.length === 0 ? (

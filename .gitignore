@@ -1,9 +1,8 @@
 node_modules/
 dist/
-out/
-.next/
 .env
 .env.local
 *.log
-.turbo/
 bun.lock
+.vercel
+.convex
