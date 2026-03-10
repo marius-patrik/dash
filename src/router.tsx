@@ -21,18 +21,18 @@ function DashboardRoutes() {
   return (
     <DashboardLayout>
       <Switch>
-        <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/dashboard/sessions/new" component={NewSessionPage} />
-        <Route path="/dashboard/sessions/:id" component={SessionPage} />
-        <Route path="/dashboard/sessions" component={SessionsPage} />
-        <Route path="/dashboard/agents/:id" component={EditAgentPage} />
-        <Route path="/dashboard/agents" component={AgentsPage} />
-        <Route path="/dashboard/mcp" component={McpPage} />
-        <Route path="/dashboard/skills/:id" component={EditSkillPage} />
-        <Route path="/dashboard/skills" component={SkillsPage} />
-        <Route path="/dashboard/memory" component={MemoryPage} />
-        <Route path="/dashboard/context" component={ContextPresetsPage} />
-        <Route path="/dashboard/settings" component={SettingsPage} />
+        <Route path="/sessions/new" component={NewSessionPage} />
+        <Route path="/sessions/:id" component={SessionPage} />
+        <Route path="/sessions" component={SessionsPage} />
+        <Route path="/agents/:id" component={EditAgentPage} />
+        <Route path="/agents" component={AgentsPage} />
+        <Route path="/mcp" component={McpPage} />
+        <Route path="/skills/:id" component={EditSkillPage} />
+        <Route path="/skills" component={SkillsPage} />
+        <Route path="/memory" component={MemoryPage} />
+        <Route path="/context" component={ContextPresetsPage} />
+        <Route path="/settings" component={SettingsPage} />
+        <Route path="/" component={DashboardPage} />
       </Switch>
     </DashboardLayout>
   );
@@ -62,7 +62,17 @@ function AuthenticatedApp() {
     );
   }
 
-  return <DashboardRoutes />;
+  return (
+    <Switch>
+      <Route path="/dashboard/:rest*" nest>
+        <DashboardRoutes />
+      </Route>
+      <Route path="/dashboard" component={DashboardRoutes} />
+      <Route>
+        <Redirect href="/dashboard" replace />
+      </Route>
+    </Switch>
+  );
 }
 
 export function AppRouter() {
