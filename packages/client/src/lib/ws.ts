@@ -1,7 +1,13 @@
 import type { WsClientMessage, WsServerMessage } from "@dash/shared";
 import { supabase } from "./supabase";
 
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
+function getWsBase(): string {
+  if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
+  const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${proto}//${window.location.host}`;
+}
+
+const WS_BASE = getWsBase();
 
 export function createChatSocket(
   onMessage: (msg: WsServerMessage) => void,

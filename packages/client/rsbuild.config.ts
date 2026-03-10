@@ -14,11 +14,14 @@ export default defineConfig({
       "process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY": JSON.stringify(
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder",
       ),
+      "process.env.NEXT_PUBLIC_SITE_URL": JSON.stringify(
+        process.env.NEXT_PUBLIC_SITE_URL || "",
+      ),
       "process.env.NEXT_PUBLIC_API_URL": JSON.stringify(
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+        process.env.NEXT_PUBLIC_API_URL || "",
       ),
       "process.env.NEXT_PUBLIC_WS_URL": JSON.stringify(
-        process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001",
+        process.env.NEXT_PUBLIC_WS_URL || "",
       ),
     },
   },
